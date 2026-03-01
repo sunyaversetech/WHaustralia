@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectToDb } from "@/lib/db";
-import { uploadToS3 } from "@/server/lib/function";
 import { Deal } from "@/server/models/DealSchema.model";
 
 export async function POST(req: NextRequest) {

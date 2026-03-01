@@ -1,0 +1,225 @@
+"use client";
+
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Star, MessageSquare, User, Loader2, Send } from "lucide-react";
+import { format } from "date-fns";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { useCreateReview, useGetReview } from "@/services/review.service";
+import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+
+const reviewSchema = z.object({
+  business_id: z.string().optional(),
+  rating: z.number().min(1, "Please select at least 1 star").max(5),
+  comment: z.string().min(10, "Comment must be at least 10 characters"),
+});
+
+export type Reviews = z.infer<typeof reviewSchema>;
+
+export default function BusinessReviewSection() {
+  const form = useForm<Reviews>({
+    resolver: zodResolver(reviewSchema),
+    defaultValues: { rating: 0, comment: "" },
+  });
+  const params = useParams();
+  const { id } = params;
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const { data: reviews } = useGetReview(String(id));
+  const queryClient = useQueryClient();
+
+  console.log("reviews", reviews);
+
+  const { mutate } = useCreateReview();
+
+  async function onSubmit(values: z.infer<typeof reviewSchema>) {
+    if (status === "unauthenticated") {
+      router.push("/auth");
+      toast.error("Please login to leave a review");
+    }
+    mutate(
+      { ...values, business_id: String(id) },
+      {
+        onSuccess: () => {
+          form.reset();
+          queryClient.invalidateQueries({ queryKey: ["review"] });
+        },
+        onError: (error: any) => {
+          console.log(error);
+          toast.error(String(error) || "Failed to create review");
+          console.error(
+            error.response?.data?.message || "Failed to create review",
+          );
+        },
+      },
+    );
+  }
+
+  console.log("session", session);
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-10 py-10">
+      <Card className="border-slate-200 shadow-sm overflow-hidden">
+        <CardHeader className="bg-slate-50/50">
+          <CardTitle className="text-xl flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-[#f97316]" />
+            Leave a Review
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="rating"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-semibold text-slate-700">
+                      How would you rate your experience? *
+                    </FormLabel>
+                    <div className="flex gap-2 mt-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={cn(
+                            "w-8 h-8 cursor-pointer transition-all hover:scale-110",
+                            star <= field.value
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-slate-300",
+                          )}
+                          onClick={() => field.onChange(star)}
+                        />
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="comment"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-semibold text-slate-700">
+                      Your Feedback *
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Write your thoughts here..."
+                        className="min-h-[120px] bg-slate-50/50 focus:bg-white transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  className="bg-[#f97316] cursor-pointer text-black hover:bg-[#ea580c] px-8 py-6 text-md font-bold rounded-lg gap-2">
+                  {false ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                  Post Review
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+
+      <div className="space-y-6 mt-10">
+        <div className="flex items-center gap-3 px-2">
+          <h3 className="text-2xl font-bold text-slate-900">Recent Reviews</h3>
+          <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-sm font-medium">
+            {reviews?.data?.length}
+          </span>
+        </div>
+
+        <Separator />
+
+        <div className="space-y-4">
+          {reviews?.data && reviews?.data?.length > 0 ? (
+            reviews?.data?.map((review) => (
+              <div
+                key={review._id}
+                className="p-6 rounded-2xl border border-slate-100 bg-white hover:border-slate-200 transition-all shadow-sm">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-3">
+                    <Avatar>
+                      <AvatarImage src={review.user?.image} />
+                      <AvatarFallback>{review.user?.name}</AvatarFallback>
+                    </Avatar>
+                    {session?.user?.id === review.user?._id && (
+                      <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-sm font-medium">
+                        You
+                      </span>
+                    )}
+                    {session?.user?.id === review.user?._id && (
+                      <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-sm font-medium">
+                        You
+                      </span>
+                    )}
+                    <div>
+                      <h4 className="font-bold text-slate-900 leading-none"></h4>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {format(new Date(review.created_at), "MMM dd, yyyy")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={cn(
+                          "w-4 h-4",
+                          i < review.rating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-slate-200",
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-slate-600 leading-relaxed pl-1">
+                  {review.comment}
+                </p>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-20 border-2 border-dashed border-slate-100 rounded-3xl">
+              <User className="w-12 h-12 text-slate-200 mx-auto mb-3" />
+              <p className="text-slate-400">
+                No reviews yet. Be the first to share your experience!
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

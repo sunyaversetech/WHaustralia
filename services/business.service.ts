@@ -1,21 +1,27 @@
 import { useFetcher } from "@/lib/generic.service";
 import { ApiResponseType } from "./apitypes";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 export type UserBusinessType = {
-  name: { type: string };
-  category: { type: "user" | "business" };
-  email: { type: string; unique: true; lowercase: true };
-  city: { type: string };
-  city_name: { type: string };
-  location: { type: string };
-  community: { type: string };
-  community_name: { type: string };
-  image: { type: string };
-  business_name: { type: string };
-  business_category: { type: string };
-  abn_number: { type: string };
-  verified: { type: boolean; default: false };
+  _id?: string;
+  name: string;
+  category: "user" | "business";
+  email: string;
+  city: string;
+  city_name: string;
+  location: string;
+  community: string;
+  community_name: string;
+  image: string;
+
+  business_name?: string;
+  business_category?: string;
+  abn_number?: string;
+  verified: boolean;
+
+  emailVerified?: Date | null;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 };
 export const useGetBusiness = () => {
   const param = useSearchParams();
@@ -25,5 +31,15 @@ export const useGetBusiness = () => {
     ["getbusinesses", category, search],
     null,
     `/api/business?category=${category}&search=${search}`,
+  );
+};
+
+export const useGetSingleBusiness = () => {
+  const param = useParams();
+  const id = (param.id as string) || "";
+  return useFetcher<ApiResponseType<UserBusinessType>>(
+    ["getbusiness", id],
+    null,
+    `/api/business/${id}`,
   );
 };

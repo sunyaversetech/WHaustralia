@@ -12,12 +12,9 @@ import {
 } from "lucide-react";
 import type { Business } from "@/lib/types";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
-interface BusinessCardProps {
-  business: Business;
-}
-
-export default function BusinessCard({ business }: BusinessCardProps) {
+export default function BusinessCard({ business }: { business: any }) {
   const getCategoryInfo = () => {
     switch (business.category) {
       case "restaurant":
@@ -72,16 +69,14 @@ export default function BusinessCard({ business }: BusinessCardProps) {
     }
   };
 
-  const categoryInfo = getCategoryInfo();
+  const router = useRouter();
 
-  const handleCardClick = () => {
-    window.location.href = `/businesses/${business.id}`;
-  };
+  const categoryInfo = getCategoryInfo();
 
   return (
     <div
       className="card overflow-hidden group cursor-pointer"
-      onClick={handleCardClick}>
+      onClick={() => router.push(`/businesses/${business._id}`)}>
       <div className="relative w-full h-56 md:h-60 rounded-xl overflow-hidden  group">
         <Image
           width={500}

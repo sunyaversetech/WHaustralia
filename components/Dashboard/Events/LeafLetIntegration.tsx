@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { useMapEvents, useMap } from "react-leaflet";
-import L from "leaflet";
+import { useState, useEffect, useMemo } from "react";
 import "leaflet/dist/leaflet.css";
 import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -10,48 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Navigation, Search, Loader2, MapPin } from "lucide-react";
 import debounce from "lodash.debounce";
 
-const icon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-
-function ChangeView({ center }: { center: [number, number] }) {
-  const map = useMap();
-  useEffect(() => {
-    map.flyTo(center, 13);
-  }, [center, map]);
-  return null;
-}
-
-function MapEventsHandler({
-  onLocationSelect,
-}: {
-  onLocationSelect: (lat: number, lng: number) => void;
-}) {
-  useMapEvents({
-    click(e) {
-      onLocationSelect(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return null;
-}
-
 interface MapPickerProps {
   form: UseFormReturn<any>;
 }
 
 export default function MapPicker({ form }: MapPickerProps) {
-  const lat = form.watch("latitude");
-  const lng = form.watch("longitude");
   const locationName = form.watch("location");
 
   const [searchQuery, setSearchQuery] = useState(locationName || "");
   const [results, setResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-
-  const defaultCenter: [number, number] = [-33.8688, 151.2093];
 
   const debouncedFetch = useMemo(
     () =>
@@ -124,22 +90,6 @@ export default function MapPicker({ form }: MapPickerProps) {
         form.setValue("location", "Selected Location");
       }
     });
-  };
-
-  const handleMapClick = async (clickedLat: number, clickedLng: number) => {
-    form.setValue("latitude", clickedLat);
-    form.setValue("longitude", clickedLng);
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${clickedLat}&lon=${clickedLng}`,
-      );
-      const data = await res.json();
-      const addr = data.display_name || "Custom Point";
-      form.setValue("location", addr);
-      setSearchQuery(addr);
-    } catch (e) {
-      form.setValue("location", "Custom Point");
-    }
   };
 
   return (
