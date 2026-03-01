@@ -10,6 +10,10 @@ import {
   User,
   CirclePile,
   HeartPlus,
+  Calendar,
+  Ticket,
+  BadgeDollarSign,
+  Settings,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -48,21 +52,21 @@ const Sidebar = () => {
         },
         {
           name: "booking",
-          icon: Album,
+          icon: Calendar,
           link: "/dashboard/bookings",
           hasDropdown: false,
           active: pathname === "/dashboard/bookings",
         },
         {
           name: "deals",
-          icon: HeartHandshake,
+          icon: BadgeDollarSign,
           link: "/dashboard/deals",
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/deals"),
         },
         {
           name: "events",
-          icon: Calendar1,
+          icon: Ticket,
           link: "/dashboard/events",
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/events"),
@@ -98,12 +102,19 @@ const Sidebar = () => {
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/favorite"),
         },
+        {
+          name: "Settings",
+          icon: Settings,
+          link: "/dashboard/",
+          hasDropdown: false,
+          active: pathname.startsWith("/dashboard/settings"),
+        },
       ],
     },
   ];
 
   return (
-    <div className="w-20 sm:w-17 min-h-screen bg-black text-white border-r overflow-y-auto flex flex-col p-4 font-sans text-sm overflow-hidden ">
+    <div className="min-h-screen bg-[#041e3a] text-white border-r overflow-y-auto flex flex-col p-4 font-sans text-sm overflow-hidden ">
       {menuData.map((group, idx) => (
         <div key={idx} className="">
           <div className="space-y-1 ">
@@ -111,13 +122,15 @@ const Sidebar = () => {
               return (
                 <div key={item.link}>
                   <div
-                    className={`relative group  flex items-center rounded-lg mb-2 transition-colors ${item.active ? "bg-slate-100 text-black" : "hover:bg-slate-100 hover:text-black"}`}>
+                    className={`relative group  flex items-center rounded-md mb-2 transition-colors duration-200 ease-in-out ${item.active ? "bg-slate-100 text-black" : "hover:bg-gray-500 hover:text-white"}`}
+                  >
                     <Link
                       title={item.name}
                       aria-label={item.name}
                       href={item.link || "#"}
-                      className="flex-1 flex items-center gap-3 p-2 pr-10">
-                      <item.icon size={18} strokeWidth={1.5} />
+                      className="flex-1 flex items-center gap-3 p-2 pr-10 capitalize font-medium "
+                    >
+                      <item.icon size={28} strokeWidth={1.5} /> {item.name}
                     </Link>
                   </div>
                 </div>

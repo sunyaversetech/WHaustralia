@@ -28,6 +28,7 @@ import { useCreateEvent } from "@/services/event.service";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import MapPicker from "./LeafLetIntegration";
+import { ChevronLeft } from "lucide-react";
 
 const toggleItemStyles =
   "border! rounded-lg! px-7! py-2! data-[state=on]:bg-primary! data-[state=on]:text-primary-foreground! flex-1";
@@ -107,355 +108,375 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
   };
   return (
     <Form {...form}>
-      <h1 className="text-2xl font-bold mb-4 ">Add New Event</h1>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 space-y-4">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title</FormLabel>
-                <FormControl>
-                  <Input placeholder="Event Name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* 2. Image */}
-          <FormField
-            control={form.control}
-            name="image"
-            render={({ field: { value, onChange, ...fieldProps } }) => (
-              <FormItem>
-                <FormLabel>Event Image</FormLabel>
-                <FormControl>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => onChange(e.target.files?.[0])}
-                    {...fieldProps}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* 3. Venue */}
-          <FormField
-            control={form.control}
-            name="venue"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Venue</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g. Grand Ballroom" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g. hello@gmail.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phone_number"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone Number</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="e.g. +61 234 567 890"
-                    {...field}
-                    onChange={(e) => Number(e.target.value)}
-                    type="number"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="website_link"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Website Link</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g. example.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* 4. Date Range */}
-          <FormField
-            control={form.control}
-            name="dateRange"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>From and to Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start border rounded-lg">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {field.value?.from ? (
-                        field.value.to ? (
-                          `${format(field.value.from, "PP")} - ${format(field.value.to, "PP")}`
-                        ) : (
-                          format(field.value.from, "PP")
-                        )
-                      ) : (
-                        <span>Pick Dates</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="range"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      numberOfMonths={2}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="startTime"
-            render={({ field }) => (
-              <FormItem className="mt-1 gap-1 flex flex-col">
-                <FormLabel>Time From</FormLabel>
-                <FormControl>
-                  <Input type="time" className="rounded-lg" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="endTime"
-            render={({ field }) => (
-              <FormItem className="mt-1 gap-1 flex flex-col">
-                <FormLabel>Time To</FormLabel>
-                <FormControl>
-                  <Input type="time" className="rounded-lg" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
+      <div className="px-10">
+        <div className="flex items-start justify-start p-4 -ml-4">
+          <ChevronLeft
+            className="h-8 w-8 cursor-pointer rounded-md border bg-white p-1.5 
+               text-[#ODODOD] 
+               transition-all hover:scale-105 active:scale-95"
           />
         </div>
-
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <FormControl>
-                <ToggleGroup
-                  type="single"
-                  value={field.value}
-                  onValueChange={(val) => val && field.onChange(val)}
-                  className="grid grid-cols-3 md:grid-cols-10 gap-2">
-                  {[
-                    "Community",
-                    "Festival",
-                    "Cultural Event",
-                    "Event",
-                    "Others",
-                  ].map((cat) => (
-                    <ToggleGroupItem
-                      key={cat}
-                      value={cat}
-                      className={toggleItemStyles}>
-                      {cat}
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        {form.watch("category") === "Others" && (
-          <FormField
-            control={form.control}
-            name="category_name"
-            render={({ field }) => (
-              <FormItem className="mt-1 gap-1 flex flex-col">
-                <FormLabel>Category Name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        )}
-
-        <FormField
-          control={form.control}
-          name="price_category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Price Category</FormLabel>
-              <FormControl>
-                <ToggleGroup
-                  type="single"
-                  value={field.value}
-                  onValueChange={(val) => val && field.onChange(val)}
-                  className="flex gap-2">
-                  <ToggleGroupItem value="free" className={toggleItemStyles}>
-                    Free
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="paid" className={toggleItemStyles}>
-                    Paid
-                  </ToggleGroupItem>
-                </ToggleGroup>
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        {form.watch("price_category") === "paid" && (
-          <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-1">
+        <h1 className="text-2xl text-[#ODODOD] font-bold mb-4 ">
+          Add New Event
+        </h1>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 space-y-4">
             <FormField
-              name="ticket_price"
+              control={form.control}
+              name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price</FormLabel>
+                  <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <Input placeholder="Event Name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* 2. Image */}
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field: { value, onChange, ...fieldProps } }) => (
+                <FormItem>
+                  <FormLabel>Event Image</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => onChange(e.target.files?.[0])}
+                      {...fieldProps}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* 3. Venue */}
+            <FormField
+              control={form.control}
+              name="venue"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Venue</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. Grand Ballroom" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. hello@gmail.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g. +61 234 567 890"
+                      {...field}
+                      onChange={(e) => Number(e.target.value)}
+                      type="number"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="website_link"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Website Link</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* 4. Date Range */}
+            <FormField
+              control={form.control}
+              name="dateRange"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>From and to Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start border rounded-lg"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {field.value?.from ? (
+                          field.value.to ? (
+                            `${format(field.value.from, "PP")} - ${format(field.value.to, "PP")}`
+                          ) : (
+                            format(field.value.from, "PP")
+                          )
+                        ) : (
+                          <span>Pick Dates</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="range"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        numberOfMonths={2}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="startTime"
+              render={({ field }) => (
+                <FormItem className="mt-1 gap-1 flex flex-col">
+                  <FormLabel>Time From</FormLabel>
+                  <FormControl>
+                    <Input type="time" className="rounded-lg" {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
             <FormField
-              name="ticket_link"
+              control={form.control}
+              name="endTime"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ticket Link</FormLabel>
+                <FormItem className="mt-1 gap-1 flex flex-col">
+                  <FormLabel>Time To</FormLabel>
+                  <FormControl>
+                    <Input type="time" className="rounded-lg" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <FormControl>
+                  <ToggleGroup
+                    type="single"
+                    value={field.value}
+                    onValueChange={(val) => val && field.onChange(val)}
+                    className="grid grid-cols-3 md:grid-cols-10 gap-2"
+                  >
+                    {[
+                      "Community",
+                      "Festival",
+                      "Cultural Event",
+                      "Event",
+                      "Others",
+                    ].map((cat) => (
+                      <ToggleGroupItem
+                        key={cat}
+                        value={cat}
+                        className={toggleItemStyles}
+                      >
+                        {cat}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {form.watch("category") === "Others" && (
+            <FormField
+              control={form.control}
+              name="category_name"
+              render={({ field }) => (
+                <FormItem className="mt-1 gap-1 flex flex-col">
+                  <FormLabel>Category Name</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
-          </div>
-        )}
+          )}
 
-        <FormField
-          control={form.control}
-          name="community"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Community</FormLabel>
-              <FormControl>
-                <ToggleGroup
-                  type="single"
-                  value={field.value}
-                  onValueChange={(val) => val && field.onChange(val)}
-                  className="grid grid-cols-3 md:grid-cols-10 gap-2">
-                  {[
-                    "Australian",
-                    "Nepali",
-                    "Indian",
-                    "Bhutanese",
-                    "European",
-                    "Others",
-                  ].map((com) => (
-                    <ToggleGroupItem
-                      key={com}
-                      value={com}
-                      className={toggleItemStyles}>
-                      {com}
+          <FormField
+            control={form.control}
+            name="price_category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Price Category</FormLabel>
+                <FormControl>
+                  <ToggleGroup
+                    type="single"
+                    value={field.value}
+                    onValueChange={(val) => val && field.onChange(val)}
+                    className="flex gap-2"
+                  >
+                    <ToggleGroupItem value="free" className={toggleItemStyles}>
+                      Free
                     </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="city"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>City</FormLabel>
-              <FormControl>
-                <ToggleGroup
-                  type="single"
-                  value={field.value}
-                  onValueChange={(val) => val && field.onChange(val)}
-                  className="grid grid-cols-3 md:grid-cols-10 gap-2">
-                  {[
-                    "Sydney",
-                    "Canberra",
-                    "Melbourne",
-                    "Brisbane",
-                    "Adelaide",
-                    "Gold Coast",
-                    "Perth",
-                    "Hobart",
-                    "Darwin",
-                    "others",
-                  ].map((cat) => (
-                    <ToggleGroupItem
-                      key={cat}
-                      value={cat}
-                      className={toggleItemStyles}>
-                      {cat}
+                    <ToggleGroupItem value="paid" className={toggleItemStyles}>
+                      Paid
                     </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-              </FormControl>
-            </FormItem>
+                  </ToggleGroup>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {form.watch("price_category") === "paid" && (
+            <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-1">
+              <FormField
+                name="ticket_price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="ticket_link"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ticket Link</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
           )}
-        />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea className="rounded-lg" {...field} />
-              </FormControl>
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="community"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Community</FormLabel>
+                <FormControl>
+                  <ToggleGroup
+                    type="single"
+                    value={field.value}
+                    onValueChange={(val) => val && field.onChange(val)}
+                    className="grid grid-cols-3 md:grid-cols-10 gap-2"
+                  >
+                    {[
+                      "Australian",
+                      "Nepali",
+                      "Indian",
+                      "Bhutanese",
+                      "European",
+                      "Others",
+                    ].map((com) => (
+                      <ToggleGroupItem
+                        key={com}
+                        value={com}
+                        className={toggleItemStyles}
+                      >
+                        {com}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <MapPicker form={form} />
+          <FormField
+            control={form.control}
+            name="city"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>City</FormLabel>
+                <FormControl>
+                  <ToggleGroup
+                    type="single"
+                    value={field.value}
+                    onValueChange={(val) => val && field.onChange(val)}
+                    className="grid grid-cols-3 md:grid-cols-10 gap-2"
+                  >
+                    {[
+                      "Sydney",
+                      "Canberra",
+                      "Melbourne",
+                      "Brisbane",
+                      "Adelaide",
+                      "Gold Coast",
+                      "Perth",
+                      "Hobart",
+                      "Darwin",
+                      "others",
+                    ].map((cat) => (
+                      <ToggleGroupItem
+                        key={cat}
+                        value={cat}
+                        className={toggleItemStyles}
+                      >
+                        {cat}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <Button
-          type="submit"
-          className="w-full h-12 text-lg rounded-lg"
-          disabled={isPending}>
-          {isPending ? "Creating Event..." : "Create Event"}
-        </Button>
-      </form>
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea className="rounded-lg" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <MapPicker form={form} />
+
+          <Button
+            type="submit"
+            className="w-full h-12 text-lg rounded-lg"
+            disabled={isPending}
+          >
+            {isPending ? "Creating Event..." : "Create Event"}
+          </Button>
+        </form>
+      </div>
     </Form>
   );
 }

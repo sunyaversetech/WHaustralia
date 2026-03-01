@@ -39,13 +39,14 @@ export default function EventsBackend() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-10 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight">Events Dashboard</h1>
 
         <Link
           href="/dashboard/events/add-event"
-          className="ml-auto flex bg-red-500 text-white items-center p-2 rounded-sm hover:bg-red-600">
+          className="ml-auto flex bg-[#041e3a] text-white items-center p-2 rounded-md hover:bg-slate-100 hover:text-[#041e3a] border hover:border-[#041e3a] transition-colors duration-200"
+        >
           <PlusCircle className="mr-2 h-4 w-4" /> Add Event
         </Link>
       </div>
@@ -67,7 +68,8 @@ export default function EventsBackend() {
               <TableRow>
                 <TableCell
                   colSpan={5}
-                  className="text-center py-10 text-muted-foreground">
+                  className="text-center py-10 text-muted-foreground"
+                >
                   No events found. Click `Add Event` to start.
                 </TableCell>
               </TableRow>
@@ -95,7 +97,8 @@ export default function EventsBackend() {
                         <DialogTitle className="text-sm ">
                           <span
                             className="inline-block text-white bg-slate-800 px-2 py-1 rounded-md"
-                            title={event.title}>
+                            title={event.title}
+                          >
                             {event.title}
                           </span>
                         </DialogTitle>
