@@ -22,15 +22,15 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { useCreateEvent, useGetSingleEvent } from "@/services/event.service";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import MapPicker from "./LeafLetIntegration";
 import { ChevronLeft } from "lucide-react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import Image from "next/image";
 
 const toggleItemStyles =
   "border! rounded-lg! px-7! py-2! data-[state=on]:bg-primary! min-w-fit data-[state=on]:text-primary-foreground! w-full  flex-1";
@@ -38,7 +38,15 @@ const toggleItemStyles =
 export const eventSchema = z.object({
   _id: z.string().optional(),
   title: z.string().min(2, "Title is required"),
-  image: z.any().refine((file) => file instanceof File, "Image is required"),
+  image: z.union([
+    z.string(),
+    z
+      .any()
+      .refine(
+        (file) => file instanceof File,
+        "Image must be either a string or a file",
+      ),
+  ]),
   venue: z.string().min(2, "Venue is required"),
   dateRange: z.object({
     from: z.date(),
@@ -75,37 +83,47 @@ export function EventForm() {
 
   const data = singleEventData?.data;
 
-  console.log("datadata", data);
+  console.log("singleeventdata", data);
+
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
-      title: data?.title ?? "",
+      _id: data ? data?._id : "",
+      title: data ? data?.title : "",
       venue: data?.venue ?? "",
       startTime: data?.startTime ?? "",
       endTime: data?.endTime ?? "",
+      image: data ? data?.image : "",
       community: data?.community ?? "",
       city: data?.city ?? "",
       description: data?.description ?? "",
       location: data?.location ?? "",
+      dateRange: data?.dateRange ?? { from: new Date(), to: new Date() },
       latitude: data?.latitude ?? 0,
       longitude: data?.longitude ?? 0,
       category: data?.category ?? "",
       category_name: data?.category_name ?? "",
-      price_category: data?.price_category ?? "free",
       ticket_link: data?.ticket_link ?? "",
       ticket_price: data?.ticket_price ?? "",
       email: data?.email ?? "",
-      phone_number: data?.phone_number ?? undefined,
+      phone_number: Number(data?.phone_number) ?? undefined,
       website_link: data?.website_link ?? "",
     },
   });
 
   useEffect(() => {
     if (data) {
+      form.setValue("_id", data._id);
       form.setValue("title", data.title);
       form.setValue("venue", data.venue);
       form.setValue("startTime", data.startTime);
       form.setValue("endTime", data.endTime);
+      if (data?.dateRange?.from) {
+        form.setValue("dateRange.from", data.dateRange.from);
+      }
+      if (data?.dateRange?.to) {
+        form.setValue("dateRange.to", data.dateRange.to);
+      }
       form.setValue("community", data.community);
       form.setValue("city", data.city);
       form.setValue("description", data.description);
@@ -118,17 +136,17 @@ export function EventForm() {
       form.setValue("ticket_link", data.ticket_link ?? "");
       form.setValue("ticket_price", data.ticket_price ?? "");
       form.setValue("email", data.email);
-      form.setValue("phone_number", data.phone_number);
+      form.setValue("phone_number", Number(data.phone_number));
       form.setValue("website_link", data.website_link);
+      form.setValue("image", data.image);
     }
   }, [data, form]);
 
   const onSubmit = (values: EventFormValues) => {
     const formData = new FormData();
     Object.entries(values).forEach(([key, value]) => {
-      if (key === "dateRange") {
-        formData.append("startDate", (value as any).from.toISOString());
-        formData.append("endDate", (value as any).to.toISOString());
+      if (key === "dateRange" && value) {
+        formData.append(key, JSON.stringify(value));
       } else {
         formData.append(key, value as any);
       }
@@ -136,7 +154,11 @@ export function EventForm() {
 
     mutate(formData as any, {
       onSuccess: () => {
-        toast.success("Event created successfully!");
+        toast.success(
+          formData.get("_id")
+            ? "Event updated successfully"
+            : "Event created successfully!",
+        );
         queryClient.invalidateQueries({ queryKey: ["event"] });
         router.push("/dashboard/events");
         form.reset();
@@ -146,11 +168,16 @@ export function EventForm() {
       },
     });
   };
+
+  console.log("Form", form.getValues());
+  console.log("Form", form.formState.errors);
+
   return (
     <Form {...form}>
       <div className="px-10">
         <div className="flex items-start justify-start p-4 -ml-4">
           <ChevronLeft
+            onClick={() => router.back()}
             className="h-8 w-8 cursor-pointer rounded-md border bg-white p-1.5 
                text-[#ODODOD] 
                transition-all hover:scale-105 active:scale-95"
@@ -160,7 +187,7 @@ export function EventForm() {
           {data ? "Edit Event" : "Add New Event"}{" "}
         </h1>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
-          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 items-start space-y-4">
             <FormField
               control={form.control}
               name="title"
@@ -174,25 +201,58 @@ export function EventForm() {
                 </FormItem>
               )}
             />
+            <div className="flex flex-col">
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field: { value, onChange, ...fieldProps } }) => (
+                  <FormItem>
+                    <FormLabel>Event Image</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        // Resetting value to empty string allows re-selecting the same file
+                        onChange={(e) => onChange(e.target.files?.[0])}
+                        {...fieldProps}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="image"
-              render={({ field: { value, onChange, ...fieldProps } }) => (
-                <FormItem>
-                  <FormLabel>Event Image</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => onChange(e.target.files?.[0])}
-                      {...fieldProps}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+              {form.watch("image") && (
+                <div className="mt-2">
+                  <div className="flex items-center gap-2 px-3 py-1.5 border rounded-md bg-transparent border-slate-200 w-fit max-w-[250px]">
+                    <button
+                      type="button"
+                      className="text-sm text-blue-600 hover:underline truncate cursor-pointer"
+                      onClick={() => {
+                        const file = form.getValues("image");
+                        const url =
+                          typeof file === "string"
+                            ? file
+                            : URL.createObjectURL(file);
+                        window.open(url, "_blank");
+                      }}>
+                      {typeof form.watch("image") === "string"
+                        ? form.watch("image").split("/").pop()
+                        : form.watch("image")?.name}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => form.setValue("image", undefined)}
+                      className="flex-shrink-0 ml-1 text-slate-400 hover:text-red-500 transition-colors">
+                      <span className="text-lg font-bold leading-none">
+                        &times;
+                      </span>
+                    </button>
+                  </div>
+                </div>
               )}
-            />
+            </div>
 
             <FormField
               control={form.control}
@@ -230,7 +290,11 @@ export function EventForm() {
                     <Input
                       placeholder="e.g. +61 234 567 890"
                       {...field}
-                      onChange={(e) => Number(e.target.value)}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value ? Number(e.target.value) : "",
+                        )
+                      }
                       type="number"
                     />
                   </FormControl>

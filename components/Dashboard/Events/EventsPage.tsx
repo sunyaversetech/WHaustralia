@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 export default function EventsBackend() {
   const { data } = useGetEvent();
   const { mutate, isPending } = useDeleteEvent();
+  console.log("Event", data);
   const queryClient = useQueryClient();
   const router = useRouter();
   const handleDelete = (id: string) => {
@@ -65,7 +66,7 @@ export default function EventsBackend() {
               <TableHead>Event</TableHead>
               <TableHead>Venue</TableHead>
               <TableHead>Price</TableHead>
-              <TableHead>Coordinates</TableHead>
+              <TableHead>Location</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -128,17 +129,23 @@ export default function EventsBackend() {
                   <TableCell>
                     <div className="flex items-center text-xs text-muted-foreground">
                       <MapPin className="mr-1 h-3 w-3" />
-                      {event.latitude.toFixed(4)}, {event.longitude.toFixed(4)}
+                      {event.location.split(",")[0]}{" "}
+                      {event.location.split(",")[1]}
                     </div>
                   </TableCell>
                   <TableCell>
                     {event?.dateRange?.from
                       ? new Intl.DateTimeFormat("en-AU", {
-                          weekday: "long",
-                          year: "numeric",
+                          day: "2-digit",
                           month: "short",
-                          day: "numeric",
                         }).format(new Date(event?.dateRange?.from))
+                      : "-"}{" "}
+                    to{" "}
+                    {event?.dateRange?.to
+                      ? new Intl.DateTimeFormat("en-AU", {
+                          day: "2-digit",
+                          month: "short",
+                        }).format(new Date(event?.dateRange?.to))
                       : "-"}
                   </TableCell>
                   <TableCell>

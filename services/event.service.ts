@@ -40,18 +40,21 @@ export type EventType = {
 };
 
 export const useCreateEvent = () => {
-  return useMutation<ApiResponseType<EventFormValues>, any, EventFormValues>({
+  return useMutation<ApiResponseType<EventFormValues>, any, FormData>({
     mutationKey: ["createEvent"],
-    mutationFn: (data: EventFormValues) =>
-      data._id
-        ? PATCH<EventFormValues, ApiResponseType<EventFormValues>>({
-            url: `/api/event/edit/${data._id}`,
-            data: data,
-          })
-        : Post<EventFormValues, ApiResponseType<EventFormValues>>({
-            url: "/api/event",
-            data: data,
-          }),
+    mutationFn: (data: FormData) => {
+      if (data.get("_id")) {
+        return PATCH<FormData, ApiResponseType<EventFormValues>>({
+          url: `/api/event/edit/${data.get("_id")}`,
+          data: data,
+        });
+      } else {
+        return Post<FormData, ApiResponseType<EventFormValues>>({
+          url: "/api/event",
+          data: data,
+        });
+      }
+    },
   });
 };
 

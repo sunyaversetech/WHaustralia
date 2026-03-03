@@ -46,6 +46,14 @@ export const useGetDeals = () => {
   );
 };
 
+export const useGetSingleDeal = (id: string) => {
+  return useFetcher<ApiResponseType<DealsGetValues>>(
+    ["singleDeal", id],
+    null,
+    `/api/event/single-deal/${id}`,
+  );
+};
+
 export const useDeleteDeal = () => {
   return useMutation<ApiResponseType<{ id: string }>, any, { id: string }>({
     mutationKey: ["deleteDeal"],

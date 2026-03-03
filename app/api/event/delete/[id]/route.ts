@@ -32,7 +32,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       );
     }
 
-    await Review.findByIdAndDelete(eventId);
+    await Event.findByIdAndDelete(eventId);
 
     return NextResponse.json({ message: "Review deleted successfully" });
   } catch (error: any) {
