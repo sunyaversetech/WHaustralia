@@ -61,7 +61,7 @@ const EventCard = memo(function EventCard({ event }: { event: any }) {
   const { data: userFavorites } = useGetUserFavroite();
 
   const isEventFavorite = userFavorites?.data?.events?.some(
-    (item: { _id: string }) => item._id.toString() === eventId?.toString(),
+    (item) => (item._id ?? "").toString() === eventId?.toString(),
   );
 
   return (
