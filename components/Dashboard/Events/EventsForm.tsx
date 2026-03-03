@@ -24,14 +24,16 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
-import { useCreateEvent } from "@/services/event.service";
+import { useCreateEvent, useGetSingleEvent } from "@/services/event.service";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import MapPicker from "./LeafLetIntegration";
 import { ChevronLeft } from "lucide-react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 const toggleItemStyles =
-  "border! rounded-lg! px-7! py-2! data-[state=on]:bg-primary! data-[state=on]:text-primary-foreground! flex-1";
+  "border! rounded-lg! px-7! py-2! data-[state=on]:bg-primary! min-w-fit data-[state=on]:text-primary-foreground! w-full  flex-1";
 
 export const eventSchema = z.object({
   _id: z.string().optional(),
@@ -63,25 +65,63 @@ export const eventSchema = z.object({
 
 export type EventFormValues = z.infer<typeof eventSchema>;
 
-export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
+export function EventForm() {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useCreateEvent();
+  const router = useRouter();
+  const params = useSearchParams();
+  const id = params.get("id");
+  const { data: singleEventData } = useGetSingleEvent(id as string);
 
+  const data = singleEventData?.data;
+
+  console.log("datadata", data);
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
-      title: "",
-      venue: "",
-      startTime: "",
-      endTime: "",
-      community: "",
-      city: "",
-      description: "",
-      location: "",
-      latitude: 0,
-      longitude: 0,
+      title: data?.title ?? "",
+      venue: data?.venue ?? "",
+      startTime: data?.startTime ?? "",
+      endTime: data?.endTime ?? "",
+      community: data?.community ?? "",
+      city: data?.city ?? "",
+      description: data?.description ?? "",
+      location: data?.location ?? "",
+      latitude: data?.latitude ?? 0,
+      longitude: data?.longitude ?? 0,
+      category: data?.category ?? "",
+      category_name: data?.category_name ?? "",
+      price_category: data?.price_category ?? "free",
+      ticket_link: data?.ticket_link ?? "",
+      ticket_price: data?.ticket_price ?? "",
+      email: data?.email ?? "",
+      phone_number: data?.phone_number ?? undefined,
+      website_link: data?.website_link ?? "",
     },
   });
+
+  useEffect(() => {
+    if (data) {
+      form.setValue("title", data.title);
+      form.setValue("venue", data.venue);
+      form.setValue("startTime", data.startTime);
+      form.setValue("endTime", data.endTime);
+      form.setValue("community", data.community);
+      form.setValue("city", data.city);
+      form.setValue("description", data.description);
+      form.setValue("location", data.location);
+      form.setValue("latitude", data.latitude);
+      form.setValue("longitude", data.longitude);
+      form.setValue("category", data.category);
+      form.setValue("category_name", data.category_name);
+      form.setValue("price_category", data.price_category);
+      form.setValue("ticket_link", data.ticket_link ?? "");
+      form.setValue("ticket_price", data.ticket_price ?? "");
+      form.setValue("email", data.email);
+      form.setValue("phone_number", data.phone_number);
+      form.setValue("website_link", data.website_link);
+    }
+  }, [data, form]);
 
   const onSubmit = (values: EventFormValues) => {
     const formData = new FormData();
@@ -98,7 +138,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
       onSuccess: () => {
         toast.success("Event created successfully!");
         queryClient.invalidateQueries({ queryKey: ["event"] });
-        setOpen(false);
+        router.push("/dashboard/events");
         form.reset();
       },
       onError: (error: any) => {
@@ -117,7 +157,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
           />
         </div>
         <h1 className="text-2xl text-[#ODODOD] font-bold mb-4 ">
-          Add New Event
+          {data ? "Edit Event" : "Add New Event"}{" "}
         </h1>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 space-y-4">
@@ -135,7 +175,6 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
               )}
             />
 
-            {/* 2. Image */}
             <FormField
               control={form.control}
               name="image"
@@ -155,7 +194,6 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
               )}
             />
 
-            {/* 3. Venue */}
             <FormField
               control={form.control}
               name="venue"
@@ -214,7 +252,6 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
               )}
             />
 
-            {/* 4. Date Range */}
             <FormField
               control={form.control}
               name="dateRange"
@@ -225,8 +262,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
-                        className="w-full justify-start border rounded-lg"
-                      >
+                        className="w-full justify-start border rounded-lg">
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {field.value?.from ? (
                           field.value.to ? (
@@ -289,8 +325,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
                     type="single"
                     value={field.value}
                     onValueChange={(val) => val && field.onChange(val)}
-                    className="grid grid-cols-3 md:grid-cols-10 gap-2"
-                  >
+                    className="flex flex-wrap w-full gap-2">
                     {[
                       "Community",
                       "Festival",
@@ -301,8 +336,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
                       <ToggleGroupItem
                         key={cat}
                         value={cat}
-                        className={toggleItemStyles}
-                      >
+                        className={toggleItemStyles}>
                         {cat}
                       </ToggleGroupItem>
                     ))}
@@ -338,8 +372,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
                     type="single"
                     value={field.value}
                     onValueChange={(val) => val && field.onChange(val)}
-                    className="flex gap-2"
-                  >
+                    className="flex w-full gap-2">
                     <ToggleGroupItem value="free" className={toggleItemStyles}>
                       Free
                     </ToggleGroupItem>
@@ -353,7 +386,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
           />
 
           {form.watch("price_category") === "paid" && (
-            <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-1">
+            <div className="grid grid-cols-2  gap-4 animate-in fade-in slide-in-from-top-1">
               <FormField
                 name="ticket_price"
                 render={({ field }) => (
@@ -365,6 +398,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
                   </FormItem>
                 )}
               />
+
               <FormField
                 name="ticket_link"
                 render={({ field }) => (
@@ -390,8 +424,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
                     type="single"
                     value={field.value}
                     onValueChange={(val) => val && field.onChange(val)}
-                    className="grid grid-cols-3 md:grid-cols-10 gap-2"
-                  >
+                    className="flex flex-wrap gap-2">
                     {[
                       "Australian",
                       "Nepali",
@@ -403,8 +436,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
                       <ToggleGroupItem
                         key={com}
                         value={com}
-                        className={toggleItemStyles}
-                      >
+                        className={toggleItemStyles}>
                         {com}
                       </ToggleGroupItem>
                     ))}
@@ -425,8 +457,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
                     type="single"
                     value={field.value}
                     onValueChange={(val) => val && field.onChange(val)}
-                    className="grid grid-cols-3 md:grid-cols-10 gap-2"
-                  >
+                    className="flex flex-wrap gap-4">
                     {[
                       "Sydney",
                       "Canberra",
@@ -442,8 +473,7 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
                       <ToggleGroupItem
                         key={cat}
                         value={cat}
-                        className={toggleItemStyles}
-                      >
+                        className={toggleItemStyles}>
                         {cat}
                       </ToggleGroupItem>
                     ))}
@@ -471,9 +501,12 @@ export function EventForm({ setOpen }: { setOpen: (open: boolean) => void }) {
           <Button
             type="submit"
             className="w-full h-12 text-lg rounded-lg"
-            disabled={isPending}
-          >
-            {isPending ? "Creating Event..." : "Create Event"}
+            disabled={isPending}>
+            {isPending
+              ? "Saving Event..."
+              : data
+                ? "Update Event"
+                : "Create Event"}
           </Button>
         </form>
       </div>
