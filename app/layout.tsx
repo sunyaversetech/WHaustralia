@@ -10,6 +10,7 @@ import { FavoritesProvider } from "@/contexts/favorites-context";
 import { RedeemProvider } from "@/contexts/redeem-context";
 import { Toaster } from "sonner";
 import BottomNav from "@/components/BottomNavbar";
+import NavbarProvider from "@/components/NavbarProvider";
 
 const urbanist = Urbanist({
   subsets: ["latin"],
@@ -36,7 +37,7 @@ export default function RootLayout({
             <FavoritesProvider>
               <CityFilterProvider>
                 <SessionWrapper>
-                  <Navbar />
+                  <NavbarProvider />
                   <div className="mb-15 max-md:mt-5">{children}</div>
                   <Toaster />
                   <BottomNav />
