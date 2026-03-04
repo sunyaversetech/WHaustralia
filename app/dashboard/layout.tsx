@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div lang="en" className="flex w-full">
+    <div lang="en" className="flex w-full bg-background">
       <Sidebar />
       <div className="flex-1 ml-5 mt-2">{children}</div>
     </div>

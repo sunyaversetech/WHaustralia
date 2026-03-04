@@ -1,12 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-
-html {
-  font-family: "Urbanist";
-}
 
 @theme inline {
   --color-background: var(--background);
@@ -53,7 +48,8 @@ html {
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  /* --background: oklch(1 0 0); */
+  --background: #f9f9f9;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -147,7 +143,7 @@ html {
     font-weight: var(--font-normal);
     line-height: 1.6;
     letter-spacing: -0.01em;
-    font-family: var(--font-urbanist);
+    font-family: var(--font-roboto), sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -542,6 +538,7 @@ html {
 .font-black {
   font-weight: var(--font-black);
 }
+<<<<<<< Updated upstream
 
 /* Enhanced Typography for Urbanist */
 .heading-urbanist {
@@ -579,3 +576,5 @@ html {
 .text-urbanist-button {
   @apply font-urbanist font-semibold text-sm md:text-base tracking-wide;
 }
+=======
+>>>>>>> Stashed changes
