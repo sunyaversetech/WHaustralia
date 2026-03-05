@@ -1,5 +1,6 @@
 import { connectToDb } from "@/lib/db";
 import User from "@/server/models/Auth.model";
+import { Review } from "@/server/models/Review.model";
 import { NextRequest, NextResponse } from "next/server";
 
 function escapeRegex(text: string) {
@@ -33,8 +34,17 @@ export async function GET(request: NextRequest) {
       createdAt: -1,
     });
 
+    // const reviews = await Review.find({
+    //   bussiness_id: { $in: businesses.map((b) => b._id) },
+    // }).sort({
+    //   createdAt: -1,
+    // });
+
     return NextResponse.json(
-      { data: businesses, message: "Businesses retrieved successfully" },
+      {
+        data: businesses,
+        message: "Businesses retrieved successfully",
+      },
       { status: 200 },
     );
   } catch (error: any) {

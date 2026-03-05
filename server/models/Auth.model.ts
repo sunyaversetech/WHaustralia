@@ -13,6 +13,8 @@ const UserSchema = new Schema(
       lowercase: true,
     },
     city: { type: String },
+    longitude: { type: Number },
+    latitude: { type: Number },
     city_name: { type: String },
     location: { type: String },
     community: { type: String },

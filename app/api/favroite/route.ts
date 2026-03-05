@@ -56,6 +56,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     await connectToDb();
+
     const session = await getServerSession(authOptions);
 
     if (!session)

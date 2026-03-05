@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
       query.business_id = businessId;
     }
 
-    const reviews = await Review.find(query)
+    const reviews = await Review.find(query ?? "")
       .populate("user", { password: 0 })
       .sort({ created_at: -1 });
 

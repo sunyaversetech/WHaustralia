@@ -10,6 +10,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useSearchParams } from "next/navigation";
 import FreshaSearchBar from "@/components/Business/Search";
 import WhSearchBar from "@/components/Business/Search";
+import { useGetReview } from "@/services/review.service";
 
 const BusinessMap = dynamic(() => import("@/components/business-map"), {
   ssr: false,
@@ -19,6 +20,7 @@ export default function BusinessesClientPage() {
   const { data, isLoading } = useGetBusiness();
   const searchParams = useSearchParams();
   const view = searchParams.get("view") || "list";
+
   return (
     // <div className="min-h-screen bg-gradient-modern relative">
     //   <div className="relative z-10">

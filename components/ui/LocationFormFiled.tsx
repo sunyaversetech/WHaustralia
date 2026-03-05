@@ -5,7 +5,7 @@ import { MapPin, Loader2, X, Navigation } from "lucide-react";
 import debounce from "lodash.debounce";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"; // Using standard Input
+import { Input } from "@/components/ui/input";
 import {
   FormControl,
   FormField,
@@ -14,12 +14,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+interface LocationResult {
+  display_name: string;
+  place_id: number;
+  lat: string;
+  lon: string;
+}
+
 export function LocationFormField({ form }: { form: any }) {
   const [loading, setLoading] = React.useState(false);
   const [isLocating, setIsLocating] = React.useState(false);
-  const [results, setResults] = React.useState<
-    { display_name: string; place_id: number }[]
-  >([]);
+  const [results, setResults] = React.useState<LocationResult[]>([]);
   const [showDropdown, setShowDropdown] = React.useState(false);
 
   const fetchLocations = React.useMemo(
@@ -46,37 +51,82 @@ export function LocationFormField({ form }: { form: any }) {
     [],
   );
 
+  const handleSelectLocation = (result: LocationResult) => {
+    // Set the display name as the location value
+    form.setValue("location", result.display_name);
+
+    // Set latitude and longitude in separate fields
+    form.setValue("latitude", parseFloat(result.lat));
+    form.setValue("longitude", parseFloat(result.lon));
+
+    // You can also set them as a nested object if preferred
+    form.setValue("coordinates", {
+      lat: parseFloat(result.lat),
+      lng: parseFloat(result.lon),
+    });
+
+    setShowDropdown(false);
+  };
+
   const handleGetCurrentLocation = () => {
     if (!navigator.geolocation) return;
+
     setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`,
-        );
-        const data = await res.json();
-        if (data.display_name) form.setValue("location", data.display_name);
-      } finally {
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+
+          // Reverse geocode to get address
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+          );
+          const data = await res.json();
+
+          if (data.display_name) {
+            form.setValue("location", data.display_name);
+
+            form.setValue("latitude", latitude);
+            form.setValue("longitude", longitude);
+          }
+        } catch (error) {
+          console.error("Error getting location details:", error);
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
         setIsLocating(false);
-      }
-    });
+      },
+    );
   };
+
+  const handleClearLocation = () => {
+    form.setValue("location", "");
+    form.setValue("latitude", null);
+    form.setValue("longitude", null);
+    form.setValue("coordinates", null);
+    setResults([]);
+  };
+
+  console.log(form.getValues());
 
   return (
     <FormField
       control={form.control}
       name="location"
       render={({ field }) => (
-        <FormItem className="w-full ">
+        <FormItem className="w-full">
           <div className="flex items-center justify-between mb-2">
             <FormLabel>Location</FormLabel>
             <Button
               type="button"
               size="sm"
-              className="h-auto p-0 text-xs gap-1"
+              variant="outline"
+              className="h-auto py-1 px-2 text-xs gap-1"
               onClick={handleGetCurrentLocation}
-              disabled={isLocating}
-            >
+              disabled={isLocating}>
               {isLocating ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
               ) : (
@@ -102,12 +152,8 @@ export function LocationFormField({ form }: { form: any }) {
             {field.value && (
               <button
                 type="button"
-                onClick={() => {
-                  field.onChange("");
-                  setResults([]);
-                }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
+                onClick={handleClearLocation}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 <X className="h-4 w-4" />
               </button>
             )}
@@ -128,12 +174,8 @@ export function LocationFormField({ form }: { form: any }) {
                       <button
                         key={result.place_id}
                         type="button"
-                        onClick={() => {
-                          field.onChange(result.display_name);
-                          setShowDropdown(false);
-                        }}
-                        className="w-full flex items-start gap-2 rounded-sm px-2 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground transition-colors"
-                      >
+                        onClick={() => handleSelectLocation(result)}
+                        className="w-full flex items-start gap-2 rounded-sm px-2 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground transition-colors">
                         <MapPin className="h-4 w-4 mt-0.5 shrink-0 opacity-50" />
                         <span className="truncate">{result.display_name}</span>
                       </button>
@@ -143,6 +185,18 @@ export function LocationFormField({ form }: { form: any }) {
               </div>
             )}
           </div>
+
+          {/* Display coordinates if available (optional) */}
+          {form.watch("latitude") && form.watch("longitude") && (
+            <div className="mt-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {form.watch("latitude").toFixed(6)},{" "}
+                {form.watch("longitude").toFixed(6)}
+              </span>
+            </div>
+          )}
+
           <FormMessage />
         </FormItem>
       )}

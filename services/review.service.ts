@@ -66,7 +66,7 @@ export const useDeleteReview = () => {
 //   });
 // };
 
-export const useGetReview = (business_id: string) => {
+export const useGetReview = (business_id?: string) => {
   return useFetcher<ApiResponseType<ReviewType[]>>(
     ["review"],
     null,

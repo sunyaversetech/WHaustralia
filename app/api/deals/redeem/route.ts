@@ -74,6 +74,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     await connectToDb();
+
     const redemption = await Redemption.find();
     if (!redemption) {
       return NextResponse.json({ redeemed: false }, { status: 200 });

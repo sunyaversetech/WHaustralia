@@ -95,6 +95,8 @@ export const signupSchema = z
     city_name: z.string().optional(),
     community_name: z.string().optional(),
     city: z.string().min(1, "City is required"),
+    longitude: z.number(),
+    latitude: z.number(),
     accpetalltermsandcondition: z.boolean().refine((val) => val === true, {
       message: "You must accept the Terms of Service",
     }),

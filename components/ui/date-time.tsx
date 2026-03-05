@@ -26,7 +26,6 @@ export default function LiveDateTime() {
 
   return (
     <div className="flex items-center gap-2 text-primary">
-      {/* Date Section */}
       <div className="flex items-center gap-2">
         <div className="text-lg font-semibold">{day}</div>
         <div className="flex flex-col">
@@ -35,10 +34,8 @@ export default function LiveDateTime() {
         </div>
       </div>
 
-      {/* Divider */}
       <div className="h-8 w-[2px] bg-gray-300"></div>
 
-      {/* Day & Time */}
       <div className="flex flex-col">
         <span className="text-sm font-medium">{weekday}</span>
         <span className="text-sm">{time}</span>
