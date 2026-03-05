@@ -8,6 +8,8 @@ export interface IDeal {
   user: mongoose.Types.ObjectId;
   terms_for_the_deal: string;
   deal_code: string;
+  max_redemptions: number;
+  current_redemptions: number;
 }
 
 const DealSchema = new Schema<IDeal>(
@@ -22,6 +24,8 @@ const DealSchema = new Schema<IDeal>(
     description: { type: String, required: true },
     terms_for_the_deal: { type: String, required: true },
     deal_code: { type: String, required: true },
+    max_redemptions: { type: Number, required: true },
+    current_redemptions: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

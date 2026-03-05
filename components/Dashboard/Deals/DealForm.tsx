@@ -29,12 +29,14 @@ import { useCreateDeals } from "@/services/deal.service";
 import { toast } from "sonner";
 
 export const dealSchema = z.object({
+  _id: z.string().optional(),
   title: z.string().min(2, "Title is too short"),
   valid_till: z.date().min(1, "Date must be in the future"),
   deals_for: z.string().min(1, "Target audience is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   terms_for_the_deal: z.string().min(1, "Terms are required"),
   deal_code: z.string().toUpperCase().min(3, "Code must be 3+ characters"),
+  max_redemptions: z.number().min(1, "Max redemptions is required"),
 });
 
 export type DealFormValues = z.infer<typeof dealSchema>;
@@ -53,11 +55,7 @@ export default function DealForm() {
 
   const { mutate } = useCreateDeals();
   function onSubmit(values: DealFormValues) {
-    const formData = new FormData();
-    Object.entries(values).forEach(([key, value]) => {
-      formData.append(key, value as any);
-    });
-    mutate(formData as any, {
+    mutate(values as any, {
       onSuccess: () => {
         form.reset();
         toast("Deal created successfully");
@@ -180,6 +178,25 @@ export default function DealForm() {
                     To WHA Users
                   </ToggleGroupItem>
                 </ToggleGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="max_redemptions"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>MAX Redemption</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="How Many People can redeem it?"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

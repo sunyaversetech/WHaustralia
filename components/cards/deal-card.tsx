@@ -5,7 +5,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { useFavorites } from "@/contexts/favorites-context";
 import { useRedeem } from "@/contexts/redeem-context";
-import { Heart, Check, MapPin, Calendar, QrCode } from "lucide-react";
+import {
+  Heart,
+  Check,
+  MapPin,
+  Calendar,
+  QrCode,
+  Link2,
+  SquareArrowOutUpRight,
+} from "lucide-react";
 import type { Deal } from "@/lib/types";
 import { getBusinessById } from "@/lib/data/businesses";
 import {
@@ -16,8 +24,11 @@ import { useSession } from "next-auth/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { DealsGetValues } from "@/services/deal.service";
+import { formatDate } from "date-fns";
 
-export default function DealCard({ deal }: { deal: any }) {
+export default function DealCard({ deal }: { deal: DealsGetValues }) {
   const router = useRouter();
   const { mutate, isPending } = useCreateFavroite();
   const { data: session } = useSession();
@@ -78,44 +89,28 @@ export default function DealCard({ deal }: { deal: any }) {
               </button>
             </div>
 
-            {deal.businessId ? (
+            {deal.user && (
               <div className="flex items-start gap-3 rounded-lg p-2 -m-2 transition-colors">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center">
-                    <img
+                    <Image
+                      width={500}
+                      height={500}
                       src={deal?.user?.image || "/placeholder.svg"}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover cursor-pointer"
                       loading="lazy"
+                      alt="WHA"
+                      onClick={() => router.push(`/deals/${deal._id}`)}
                     />
                   </div>
                 </div>
                 <div>
-                  <h2 className="text-sm md:text-md font-bold text-gray-900 ">
+                  <h2 className="text-sm md:text-md font-bold flex items-center gap-2 cursor-pointer text-gray-900 ">
                     {deal?.user?.name ?? "Business Name"}
-                  </h2>
-                  <div className="flex items-center gap-2 mt-1">
-                    <p className="text-xs text-gray-500 flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {deal?.user?.location ?? "Business Location"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center">
-                    <img
-                      src={deal?.user?.image || "/placeholder.svg"}
-                      alt={`{businessName} logo`}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
+                    <SquareArrowOutUpRight
+                      size={15}
+                      onClick={() => router.push(`/deals/${deal._id}`)}
                     />
-                  </div>
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900">
-                    {deal?.user?.name ?? "Business Name"}
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-xs text-gray-500 flex items-center gap-1">
@@ -127,9 +122,7 @@ export default function DealCard({ deal }: { deal: any }) {
               </div>
             )}
 
-            {/* Bottom Section with Expiry and Claim Button */}
             <div className="mt-3  relative">
-              {/* Dotted divider line */}
               <div className="absolute top-0 left-0 right-0 h-px overflow-hidden">
                 <div className="border-t-2 border-dashed border-gray-200 w-full"></div>
               </div>
@@ -138,7 +131,7 @@ export default function DealCard({ deal }: { deal: any }) {
                 <div className="flex items-center text-xs text-gray-500 mt-1">
                   <Calendar className="h-3 w-3 mr-1" /> Expires At :
                   <span className="font-bold">
-                    {deal?.valid_till?.split("T")[0]}
+                    {formatDate(deal?.valid_till, "dd MMM yyyy")}
                   </span>
                 </div>
 

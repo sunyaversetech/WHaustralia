@@ -11,14 +11,20 @@ export async function POST(req: NextRequest) {
     if (!session)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const formData = await req.formData();
+    const {
+      title,
+      valid_till,
+      deals_for,
+      description,
+      terms_for_the_deal,
+      deal_code,
+      max_redemptions,
+    } = await req.json();
 
-    const title = formData.get("title") as string;
-    const validTill = formData.get("valid_till") as string;
-    const dealsFor = formData.get("deals_for") as string;
-    const description = formData.get("description") as string;
-    const termsForTheDeal = formData.get("terms_for_the_deal") as string;
-    const dealCode = formData.get("deal_code") as string;
+    const validTill = valid_till;
+    const dealsFor = deals_for;
+    const termsForTheDeal = terms_for_the_deal;
+    const dealCode = deal_code;
 
     if (
       !validTill ||
@@ -42,6 +48,7 @@ export async function POST(req: NextRequest) {
       description,
       terms_for_the_deal: termsForTheDeal,
       deal_code: dealCode,
+      max_redemptions,
     });
 
     return NextResponse.json(newDeal, { status: 201 });
