@@ -94,40 +94,86 @@ export default function Navbar() {
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
+              <DropdownMenuContent
+                align="end"
+                className="w-80 p-4 rounded-2xl shadow-xl bg-white border"
+              >
+                {/* Profile Header */}
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-14 w-14 rounded-full">
+                    <AvatarImage
+                      src={session?.user?.image ?? ""}
+                      alt="User"
+                      className="object-cover"
+                    />
+                    <AvatarFallback>
+                      {session?.user?.name?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div>
+                    <p className="font-semibold text-lg leading-none">
+                      {session?.user?.name || "User"}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Business Account
+                    </p>
+                  </div>
+                </div>
+
+                {/* Verify Box */}
+                <div className="mt-4">
                   <Link
-                    href="/dashboard"
-                    className="flex items-center cursor-pointer"
+                    href="/verify-email"
+                    className="flex justify-between items-center p-4 rounded-xl bg-yellow-100 border border-yellow-200 hover:bg-yellow-200 transition"
                   >
-                    <User className="mr-2 h-4 w-4" /> Dashboard
+                    <div>
+                      <p className="font-medium text-sm">
+                        Verify your email address
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Secure your account
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4" />
                   </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+                </div>
+
+                <div className="my-4 border-t" />
+                {/* Menu Items */}
+                <div className="space-y-2 text-[15px]">
                   <Link
                     href="/dashboard/profile"
-                    className="flex items-center cursor-pointer"
+                    className="block px-2 py-2 rounded-md hover:bg-gray-100 transition"
                   >
-                    <User className="mr-2 h-4 w-4" /> Profile
+                    My profile
                   </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+
                   <Link
                     href="/settings"
-                    className="flex items-center cursor-pointer"
+                    className="block px-2 py-2 rounded-md hover:bg-gray-100 transition"
                   >
-                    <Settings className="mr-2 h-4 w-4" /> Settings
+                    Personal settings
                   </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="text-red-600 cursor-pointer"
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                >
-                  <LogOut className="mr-2 h-4 w-4" /> Logout
-                </DropdownMenuItem>
+                </div>
+
+                <div className="my-4 border-t" />
+
+                <div className="space-y-2 text-[15px]">
+                  <Link
+                    href="/support"
+                    className="block px-2 py-2 rounded-md hover:bg-gray-100 transition"
+                  >
+                    Help and support
+                  </Link>
+
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="w-full text-left px-2 py-2 rounded-md hover:bg-gray-100 transition"
+                  >
+                    Log out
+                  </button>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (

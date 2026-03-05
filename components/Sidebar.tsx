@@ -20,6 +20,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { useState } from "react";
+import Image from "next/image";
 
 export type NavItem = {
   icon: LucideIcon;
@@ -114,31 +115,68 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#041e3a] text-white border-r overflow-y-auto flex flex-col p-4 font-sans text-sm overflow-hidden ">
-      {menuData.map((group, idx) => (
-        <div key={idx} className="">
-          <div className="space-y-1 ">
-            {group.items.map((item) => {
-              return (
+    <div
+      className="h-screen 
+                  w-16 md:w-56
+                  shrink-0
+                  bg-primary 
+                  text-white 
+                  border-r 
+                  flex flex-col 
+                  font-sans text-sm 
+                  transition-all duration-300"
+    >
+      <div className="flex-1 overflow-y-auto p-2 md:p-4">
+        <Link href="/" className="flex items-center justify-center ">
+          <Image
+            src="/wha/logo2.png"
+            alt="Whats Happening Australia Logo"
+            width={100}
+            height={20}
+            className="object-contain"
+            priority
+          />
+        </Link>
+        {menuData.map((group, idx) => (
+          <div key={idx} className="mb-6">
+            {/* Optional Group Label (Desktop Only) */}
+            <div className="hidden md:block text-xs uppercase text-gray-400 mb-2 px-2">
+              {group.groupLabel}
+            </div>
+
+            <div className="space-y-1">
+              {group.items.map((item) => (
                 <div key={item.link}>
-                  <div
-                    className={`relative group  flex items-center rounded-md mb-2 transition-colors duration-200 ease-in-out ${item.active ? "bg-slate-100 text-black" : "hover:bg-gray-500 hover:text-white"}`}
+                  <Link
+                    href={item.link || "#"}
+                    title={item.name}
+                    className={`flex items-center 
+                              justify-center md:justify-start
+                              gap-3 
+                              p-3 
+                              rounded-md
+                              transition-all duration-200
+                              w-full
+                              ${
+                                item.active
+                                  ? "bg-slate-100 text-black"
+                                  : "hover:bg-gray-600 hover:text-white"
+                              }`}
                   >
-                    <Link
-                      title={item.name}
-                      aria-label={item.name}
-                      href={item.link || "#"}
-                      className="flex-1 flex items-center gap-3 p-2 pr-10 capitalize font-medium "
-                    >
-                      <item.icon size={28} strokeWidth={1.5} /> {item.name}
-                    </Link>
-                  </div>
+                    {/* ICON */}
+                    <item.icon size={22} strokeWidth={1.5} />
+
+                    {/* TEXT (hidden on small screens) */}
+                    <span className="hidden md:inline capitalize font-medium">
+                      {item.name}
+                    </span>
+                  </Link>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

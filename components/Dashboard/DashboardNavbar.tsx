@@ -23,26 +23,21 @@ import {
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Button } from "../ui/button";
+import LiveDateTime from "../ui/date-time";
 
 export default function DashboardNavbar() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
 
   return (
-    <nav
-      className={`${!pathname.startsWith("/dashboard") ? "container-modern" : ""} flex items-center justify-between px-6 py-3 border-b bg-white `}
-    >
-      <Link href="/" className="flex items-center">
-        <Image
-          src="/wha/logo.png"
-          alt="Whats Happening Australia Logo"
-          width={100}
-          height={20}
-          className="object-contain"
-          priority
-        />
-      </Link>
-      <div className="flex gap-2">
+    <nav className="fixed top-0 left-0 right-0 z-50 ml-16 md:ml-56 flex items-center justify-between px-6 py-3 border-b bg-white shadow-sm">
+      <div className="flex items-center gap-4">
+        {/* Show date only on md+ */}
+        <div className="hidden md:block">
+          <LiveDateTime />
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
         {session?.user.category === "user" &&
         pathname.startsWith("/dashboard") ? (
           <Link

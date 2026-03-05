@@ -271,17 +271,21 @@
   /* Modern Gradient Text */
   .gradient-text {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(to right,
-        var(--color-secondary),
-        var(--color-neutral));
+    background-image: linear-gradient(
+      to right,
+      var(--color-secondary),
+      var(--color-neutral)
+    );
   }
 
   .gradient-text-primary {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(to right,
-        var(--color-primary),
-        var(--color-secondary),
-        var(--color-neutral));
+    background-image: linear-gradient(
+      to right,
+      var(--color-primary),
+      var(--color-secondary),
+      var(--color-neutral)
+    );
   }
 
   /* Modern Badge */
@@ -538,7 +542,6 @@
 .font-black {
   font-weight: var(--font-black);
 }
-<<<<<<< Updated upstream
 
 /* Enhanced Typography for Urbanist */
 .heading-urbanist {
@@ -576,5 +579,3 @@
 .text-urbanist-button {
   @apply font-urbanist font-semibold text-sm md:text-base tracking-wide;
 }
-=======
->>>>>>> Stashed changes
