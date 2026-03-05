@@ -126,15 +126,22 @@ export default function BusinessHeader() {
         </p>
       </div>
 
-      <div className="relative mb-6">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleSearchChange}
-          placeholder="What are you looking for?"
-          className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
-        />
+      <div className="relative mb-6 flex gap-2">
+        <div className="relative flex-[2]">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 " />
+          <input
+            type="text"
+            value={inputValue}
+            onChange={handleSearchChange}
+            placeholder="Search Local Businesses"
+            className="w-full pl-12 pr-4 py-2 bg-white border border-slate-200 rounded-full focus:outline-none  transition-all"
+          />
+        </div>
+        <div className="flex-[1]">
+          <div className="p-2 text-center text-white border border-slate-200 rounded-full bg-primary transition-all hover:bg-white hover:text-primary">
+            All Community
+          </div>
+        </div>
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar scroll-smooth">
@@ -148,9 +155,10 @@ export default function BusinessHeader() {
               onClick={() => handleCategoryClick(cat.value)}
               className={`flex flex-col items-center justify-center min-w-[100px] p-3 rounded-2xl transition-all border shrink-0 ${
                 isActive
-                  ? "bg-red-600 border-red-600 text-white shadow-lg shadow-blue-200"
+                  ? "bg-primary border-primary text-white"
                   : "bg-white border-slate-100 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
-              }`}>
+              }`}
+            >
               <Icon
                 className={`h-5 w-5 mb-2 ${isActive ? "text-white" : "text-slate-500"}`}
               />

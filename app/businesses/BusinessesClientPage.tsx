@@ -1,13 +1,15 @@
 "use client";
 
 import BusinessCard from "@/components/cards/business-card";
-import { Calendar, Loader2 } from "lucide-react";
+import { Calendar, ChevronLeft, Link, Loader2 } from "lucide-react";
 
 import dynamic from "next/dynamic";
 import BusinessHeader from "@/components/BusinessFilter";
 import { useGetBusiness } from "@/services/business.service";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useSearchParams } from "next/navigation";
+import FreshaSearchBar from "@/components/Business/Search";
+import WhSearchBar from "@/components/Business/Search";
 
 const BusinessMap = dynamic(() => import("@/components/business-map"), {
   ssr: false,
@@ -196,12 +198,6 @@ export default function BusinessesClientPage() {
 
     <div className="min-h-screen bg-neutral-50 pb-20">
       <div className="container-modern py-8">
-        <div className="mb-8 px-4">
-          <h1 className="text-3xl font-bold text-gray-800">Businesses</h1>
-          <p className="text-neutral-500 mt-1">
-            {data?.data.length} Business found
-          </p>
-        </div>
         <BusinessHeader />
 
         <Tabs value={view}>
@@ -224,7 +220,7 @@ export default function BusinessesClientPage() {
                 </p>
               </div>
             ) : (
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 {data?.data.map((business: any) => (
                   <BusinessCard key={business._id} business={business} />
                 ))}

@@ -115,7 +115,7 @@ export default function BusinessReviewSection() {
       <Card className="border-slate-200 shadow-sm overflow-hidden">
         <CardHeader className="bg-slate-50/50">
           <CardTitle className="text-xl flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-[#f97316]" />
+            <MessageSquare className="w-5 h-5 text-primary" />
             Leave a Review
           </CardTitle>
         </CardHeader>
@@ -170,13 +170,11 @@ export default function BusinessReviewSection() {
               />
 
               <div className="flex justify-end">
-                <Button
-                  type="submit"
-                  className="bg-[#f97316] cursor-pointer text-black hover:bg-[#ea580c] px-8 py-6 text-md font-bold rounded-lg gap-2">
+                <Button type="submit">
                   {false ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
-                    <Send className="w-5 h-5" />
+                    <Send className="w-5 h-5 mr-2" />
                   )}
                   Post Review
                 </Button>
@@ -201,7 +199,8 @@ export default function BusinessReviewSection() {
             reviews?.data?.map((review) => (
               <div
                 key={review._id}
-                className="p-6 rounded-2xl border border-slate-100 bg-white hover:border-slate-200 transition-all shadow-sm">
+                className="p-6 rounded-2xl border border-slate-100 bg-white hover:border-slate-200 transition-all shadow-sm"
+              >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
                     <Avatar>

@@ -53,7 +53,7 @@ const buttonVariants = cva(
           "bg-red-600 text-white border border-red-600 hover:bg-white hover:text-red-600",
       },
       size: {
-        default: "h-10 md:h-12 px-5 text-sm md:text-lg",
+        default: "h-10 px-5 text-md ",
         sm: "h-9 px-4 text-sm",
         lg: "h-12 px-6 text-lg",
         icon: "h-10 w-10",

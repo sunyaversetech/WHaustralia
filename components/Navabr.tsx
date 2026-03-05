@@ -19,11 +19,10 @@ import { Button } from "./ui/button";
 export default function Navbar() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
+  const isActive = (path: string) => pathname === path;
 
   return (
-    <nav
-      className={`${!pathname.startsWith("/dashboard") ? "container-modern" : ""} flex items-center justify-between px-6 py-3 border-b bg-white `}
-    >
+    <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b bg-white">
       <Link href="/" className="flex items-center">
         <Image
           src="/wha/logo.png"
@@ -36,23 +35,37 @@ export default function Navbar() {
       </Link>
 
       {!pathname.startsWith("/dashboard") ? (
-        <div className="hidden md:flex items-center border rounded-full px-6 py-2 gap-8 text-slate-600 font-medium shadow-sm">
-          <Link href="/events" className="hover:text-primary transition-colors">
-            Events
-          </Link>
-          <Link href="/deals" className="hover:text-primary transition-colors">
-            Deals
-          </Link>
-          <Link
-            href="/businesses"
-            className="hover:text-primary transition-colors"
-          >
-            Businesses
-          </Link>
+        <div className="hidden md:flex items-center bg-muted/40 backdrop-blur-sm border border-primary rounded-full p-1 gap-1 text-sm font-medium">
+          {[
+            { name: "Events", href: "/events" },
+            { name: "Deals", href: "/deals" },
+            { name: "Businesses", href: "/businesses" },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`px-5 py-2 rounded-full transition-all duration-300 ease-in-out
+        ${
+          isActive(item.href)
+            ? "bg-primary text-white shadow-sm"
+            : "text-primary hover:bg-primary/10 hover:text-primary"
+        }
+      `}
+            >
+              {item.name}
+            </Link>
+          ))}
+
           {status === "authenticated" && (
             <Link
               href="/dashboard"
-              className="hover:text-primary transition-colors"
+              className={`px-5 py-2 rounded-full transition-all duration-300 ease-in-out
+        ${
+          isActive("/dashboard")
+            ? "bg-primary text-white shadow-sm"
+            : "text-primary hover:bg-primary/10 hover:text-primary"
+        }
+      `}
             >
               Dashboard
             </Link>

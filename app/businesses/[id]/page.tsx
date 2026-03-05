@@ -2,7 +2,19 @@
 import dynamic from "next/dynamic";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, CheckCircle, Mail, Tag } from "lucide-react";
+import {
+  MapPin,
+  CheckCircle,
+  Mail,
+  Tag,
+  Link,
+  ChevronLeft,
+  BadgeCheck,
+  Dot,
+  Star,
+  Heart,
+  Share,
+} from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useGetSingleBusiness } from "@/services/business.service";
@@ -14,6 +26,9 @@ const Map = dynamic(() => import("./Map"), {
     <div className="h-[400px] w-full bg-slate-100 animate-pulse rounded-xl" />
   ),
 });
+
+const rating = 4;
+const totalReviews = 2000;
 
 export default function BusinessPage() {
   const params = useParams();
@@ -32,37 +47,112 @@ export default function BusinessPage() {
     abn_number: "12 345 678 910",
   };
 
-  console.log(data);
-
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
-      <div className="relative h-64 w-full rounded-2xl overflow-hidden">
-        <Image
-          width={500}
-          height={500}
-          src={data?.data.image || "/placeholder.svg"}
-          alt={data?.data.business_name ?? "Business"}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute bottom-6 left-6 text-white">
-          <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-4xl font-bold">{data?.data.business_name}</h1>
-            {business.verified && (
-              <CheckCircle className="text-blue-400 w-6 h-6 fill-current" />
-            )}
+    <div className="container-modern mx-auto p-6">
+      {/* business title and image container */}
+      <div className="flex flex-col md:flex-col">
+        {/* Business title & actions */}
+        <div className="order-2 md:order-1 mt-4 md:mt-0 mb-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4">
+            {/* Heading */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
+                {data?.data.business_name}
+              </h1>
+              {business.verified && (
+                <BadgeCheck className="text-green h-5 w-5 sm:h-6 sm:w-6" />
+              )}
+            </div>
+
+            {/* Like & Share buttons - desktop */}
+            <div className="hidden flex items-center gap-2 md:flex md:items-center md:gap-2">
+              <button className="flex items-center justify-center p-2 border rounded-full hover:bg-primary/10 transition">
+                <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              </button>
+
+              <button className="flex items-center justify-center p-2 border rounded-full hover:bg-primary/10 transition">
+                <Share className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              </button>
+            </div>
           </div>
-          <p className="flex items-center gap-2 opacity-90 text-lg">
-            <MapPin className="w-5 h-5" /> {data?.data.community_name},{" "}
-            {business.city_name}
-          </p>
+
+          {/* Business rating & info */}
+          <div className="mt-3 space-y-2 sm:space-y-0 sm:flex sm:items-center sm:gap-2 text-sm text-muted-foreground flex-wrap">
+            {/* Rating */}
+            <div className="flex items-center gap-1 sm:gap-2">
+              <span className="font-medium text-foreground">
+                {rating.toFixed(1)}
+              </span>
+              <div className="flex gap-1">
+                {[...Array(5)].map((_, index) => (
+                  <Star
+                    key={index}
+                    className={`h-4 w-4 ${
+                      index < rating
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span>({totalReviews.toLocaleString()})</span>
+            </div>
+
+            <Dot className="hidden md:block h-4 w-4" />
+
+            {/* Status */}
+            <div className="font-medium text-red-500">
+              Closed - Opens 9:00 am
+            </div>
+
+            <Dot className="hidden md:block h-4 w-4" />
+
+            {/* Location */}
+            <div>{business.city_name}</div>
+          </div>
+        </div>
+
+        {/* Business Image */}
+        <div className="order-1 md:order-2">
+          <div className="relative h-80 md:h-120 w-full rounded-2xl overflow-hidden">
+            <Image
+              src={data?.data.image || "/placeholder.svg"}
+              alt={data?.data.business_name ?? "Business"}
+              className="w-full h-full object-cover"
+              fill
+            />
+            {/* Gradient overlay */}
+            {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" /> */}
+
+            <div className="absolute inset-0 flex items-start justify-between p-3 md:hidden">
+              {/* ChevronLeft - left */}
+              <div>
+                <ChevronLeft
+                  className="h-8 w-8 cursor-pointer rounded-full border  p-1.5 
+                 text-primary bg-white transition-all hover:scale-105 active:scale-95"
+                />
+              </div>
+
+              {/* Like & Share - right */}
+              <div className="flex gap-2 ">
+                <button className="flex items-center justify-center p-2 border bg-white rounded-full transition-all hover:scale-105 active:scale-95">
+                  <Heart className="h-4 w-4 text-primary" />
+                </button>
+
+                <button className="flex items-center justify-center p-2 border rounded-full bg-white  transition-all hover:scale-105 active:scale-95">
+                  <Share className="h-4 w-4 text-primary " />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* business details  */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
         <div className="lg:col-span-2 space-y-6">
           <Card>
-            <CardContent className="pt-6">
+            <CardContent className="">
               <h2 className="text-xl font-semibold mb-4">About Business</h2>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="space-y-1">
@@ -104,7 +194,8 @@ export default function BusinessPage() {
             <CardContent className="pt-6">
               <h3 className="font-bold mb-2">Business Status</h3>
               <Badge
-                className={`${data?.data?.verified ? "bg-green-600" : "bg-red-500"}`}>
+                className={`${data?.data?.verified ? "bg-green-600" : "bg-red-500"}`}
+              >
                 {data?.data?.verified
                   ? "Verified Business"
                   : "Pending Verification"}

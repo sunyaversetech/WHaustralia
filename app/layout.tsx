@@ -31,14 +31,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${roboto.variable} antialiased`}>
+      <body className={`${roboto.variable} antialiased `}>
         <ReactQueryContext>
           <RedeemProvider>
             <FavoritesProvider>
               <CityFilterProvider>
                 <SessionWrapper>
                   <NavbarProvider />
-                  <div className="mb-15 md:mb-0 ">{children}</div>
+                  <div className="mb-15 md:mb-0 px-2 ">{children}</div>
                   <Toaster />
                   <BottomNav />
                 </SessionWrapper>

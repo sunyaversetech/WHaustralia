@@ -9,10 +9,16 @@ import {
   Star,
   Clock,
   ArrowRight,
+  ChevronLeft,
+  Dot,
+  BadgeCheck,
 } from "lucide-react";
 import type { Business } from "@/lib/types";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+
+const rating = 4;
+const totalReviews = 2000;
 
 export default function BusinessCard({ business }: { business: any }) {
   const getCategoryInfo = () => {
@@ -71,13 +77,17 @@ export default function BusinessCard({ business }: { business: any }) {
 
   const router = useRouter();
 
+  const rating = 4;
+  const totalReviews = 2000;
+
   const categoryInfo = getCategoryInfo();
 
   return (
     <div
-      className="card overflow-hidden group cursor-pointer"
-      onClick={() => router.push(`/businesses/${business._id}`)}>
-      <div className="relative w-full h-56 md:h-60 rounded-xl overflow-hidden  group">
+      className=" overflow-hidden group cursor-pointer"
+      onClick={() => router.push(`/businesses/${business._id}`)}
+    >
+      <div className="relative w-full h-56 md:h-60 rounded-xl overflow-hidden group">
         <Image
           width={500}
           height={500}
@@ -86,29 +96,42 @@ export default function BusinessCard({ business }: { business: any }) {
           className="absolute inset-0 w-full h-full object-cover"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+        {/* <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" /> */}
 
         <div className="relative z-10 h-full w-full flex flex-col justify-between p-4 text-white">
           <div className="flex items-start justify-between">
-            <div
-              className={`flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded ${categoryInfo.bg} ${categoryInfo.text}`}>
+            <div className="flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded-full bg-white text-primary">
               <Building className="w-3 h-3" />
               <span>{categoryInfo.label}</span>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 bg-black/10 hover:bg-white/10 rounded-lg p-2 backdrop-blur-sm">
-            <div>
-              <h3 className="text-sm md:text-md font-bold mb-1">
-                {business.name}
-              </h3>
-              <div className="flex items-center text-sm text-white">
-                <MapPin className="w-3 h-3 mr-1  text-white" />
-                <span className="line-clamp-1 text-xs">
-                  {business.location ?? "N/A"}
-                </span>
-              </div>
-            </div>
+      <div className="pt-3">
+        <div className="flex items-start justify-between gap-3">
+          {/* LEFT SIDE */}
+          <div className="space-y-1">
+            <h3 className="text-base md:text-lg font-semibold text-gray-900 leading-tight">
+              {business.name}
+            </h3>
+
+            <p className="text-xs md:text-sm text-muted-foreground line-clamp-1">
+              {business.city ?? ""}
+            </p>
+          </div>
+
+          {/* RIGHT SIDE - RATING */}
+          <div className="flex items-center gap-1  px-2.5 py-1 rounded-full border border-yellow-200">
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+
+            <span className="text-sm font-semibold text-gray-900">
+              {rating.toFixed(1)}
+            </span>
+
+            <span className="text-xs text-muted-foreground">
+              ({totalReviews.toLocaleString()})
+            </span>
           </div>
         </div>
       </div>

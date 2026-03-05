@@ -253,7 +253,7 @@
 
   /* Modern Container */
   .container-modern {
-    @apply container mx-auto px-3 md:px-4;
+    @apply xl:container mx-auto px-3 md:px-4;
   }
 
   /* Modern Section */
