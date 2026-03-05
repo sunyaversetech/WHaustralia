@@ -1,12 +1,7 @@
 "use client";
 import {
   LayoutDashboard,
-  Users,
-  ChevronDown,
   LucideIcon,
-  Calendar1,
-  HeartHandshake,
-  Album,
   User,
   CirclePile,
   HeartPlus,
@@ -15,7 +10,6 @@ import {
   BadgeDollarSign,
   Settings,
 } from "lucide-react";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -124,9 +118,8 @@ const Sidebar = () => {
                   border-r 
                   flex flex-col 
                   font-sans text-sm 
-                  transition-all duration-300"
-    >
-      <div className="flex-1 overflow-y-auto p-2 md:p-4">
+                  transition-all duration-300">
+      <div className="flex-1 overflow-y-auto p-2  md:p-4">
         <Link href="/" className="flex items-center justify-center ">
           <Image
             src="/wha/logo2.png"
@@ -139,11 +132,9 @@ const Sidebar = () => {
         </Link>
         {menuData.map((group, idx) => (
           <div key={idx} className="mb-6">
-            {/* Optional Group Label (Desktop Only) */}
             <div className="hidden md:block text-xs uppercase text-gray-400 mb-2 px-2">
               {group.groupLabel}
             </div>
-
             <div className="space-y-1">
               {group.items.map((item) => (
                 <div key={item.link}>
@@ -161,8 +152,7 @@ const Sidebar = () => {
                                 item.active
                                   ? "bg-slate-100 text-black"
                                   : "hover:bg-gray-600 hover:text-white"
-                              }`}
-                  >
+                              }`}>
                     {/* ICON */}
                     <item.icon size={22} strokeWidth={1.5} />
 

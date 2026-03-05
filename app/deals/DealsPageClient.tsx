@@ -5,8 +5,12 @@ import { Search, Tag } from "lucide-react";
 import { useGetAllDeals } from "@/services/deal.service";
 
 export default function DealsPageClient() {
-  const { data } = useGetAllDeals();
-
+  const { data: deals } = useGetAllDeals();
+  const currentDate = new Date();
+  const data = deals?.data.filter(
+    (deal) => currentDate <= new Date(deal.valid_till),
+  );
+  // const data = deals?.data;
   return (
     <div className="min-h-screen bg-gradient-modern relative">
       <div className="relative z-10">
@@ -96,9 +100,9 @@ export default function DealsPageClient() {
 
         {/* Deals List */}
         <div className="container-modern pb-8">
-          {data?.data && data?.data.length > 0 ? (
+          {data && data?.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
-              {data?.data.map((deal) => (
+              {data?.map((deal) => (
                 <DealCard key={deal._id} deal={deal} />
               ))}
             </div>

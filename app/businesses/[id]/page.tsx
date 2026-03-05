@@ -177,14 +177,14 @@ export default function BusinessPage() {
 
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Our Location</h2>
-            {data?.data?.location ? (
+            {/* {data?.data?.location && data?.data?.location ? (
               <Map
                 location={data?.data?.location ?? ""}
                 businessName={business.business_name}
               />
             ) : (
               "No Map For this Business"
-            )}
+            )} */}
           </div>
           <BusinessReviewSection />
         </div>
@@ -194,8 +194,7 @@ export default function BusinessPage() {
             <CardContent className="pt-6">
               <h3 className="font-bold mb-2">Business Status</h3>
               <Badge
-                className={`${data?.data?.verified ? "bg-green-600" : "bg-red-500"}`}
-              >
+                className={`${data?.data?.verified ? "bg-green-600" : "bg-red-500"}`}>
                 {data?.data?.verified
                   ? "Verified Business"
                   : "Pending Verification"}
