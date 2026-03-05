@@ -27,7 +27,7 @@ export default function DealsPageClient() {
                 </div>
               </div>
 
-              <div className="relative md:hidden">
+              {/* <div className="relative md:hidden">
                 <button
                   className={`mobile-search-button p-1.5 rounded-lg transition-colors ${
                     mobileSearchOpen
@@ -46,7 +46,7 @@ export default function DealsPageClient() {
                 {(searchTerm || selectedCity !== "all") && (
                   <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
                 )}
-              </div>
+              </div> */}
             </div>
 
             <div

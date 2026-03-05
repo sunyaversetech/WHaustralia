@@ -90,7 +90,7 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
           )}
 
           {/* Business Markers */}
-          {businesses.map((business: any) =>
+          {/* {businesses.map((business: any) =>
             business.latitude && business.longitude ? (
               <Marker
                 key={business.id}
@@ -134,7 +134,7 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
                 </Popup>
               </Marker>
             ) : null,
-          )}
+          )} */}
         </MapContainer>
       </div>
 
@@ -142,7 +142,7 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
       <div className="p-4">
         <h3 className="font-medium text-lg mb-3">All Locations</h3>
 
-        <div className="space-y-2 max-h-[300px] overflow-y-auto">
+        {/* <div className="space-y-2 max-h-[300px] overflow-y-auto">
           {businesses.map((business: any) => (
             <div
               key={business.id}
@@ -170,7 +170,7 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );
