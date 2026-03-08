@@ -72,25 +72,21 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
         <MapContainer
           center={center}
           zoom={12}
-          style={{ height: "100%", width: "100%" }}
-        >
+          style={{ height: "100%", width: "100%" }}>
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution="&copy; OpenStreetMap contributors"
           />
 
-          {/* Locate User Button */}
           <LocateUser setUserLocation={setUserLocation} />
 
-          {/* User Location Marker */}
           {userLocation && (
             <Marker position={userLocation}>
               <Popup>You are here</Popup>
             </Marker>
           )}
 
-          {/* Business Markers */}
-          {/* {businesses.map((business: any) =>
+          {businesses.map((business: any) =>
             business.latitude && business.longitude ? (
               <Marker
                 key={business.id}
@@ -100,8 +96,7 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
                 ]}
                 eventHandlers={{
                   click: () => setSelectedBusiness(business),
-                }}
-              >
+                }}>
                 <Popup>
                   <div>
                     <h3 className="font-bold text-lg">{business.name}</h3>
@@ -113,8 +108,7 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
                     <div className="flex space-x-2 mt-2">
                       <Link
                         href={`/businesses/${business.id}`}
-                        className="bg-primary px-3 py-1 rounded text-sm font-medium hover:bg-primary/80 text-white"
-                      >
+                        className="bg-primary px-3 py-1 rounded text-sm font-medium hover:bg-primary/80 text-white">
                         View Details
                       </Link>
 
@@ -124,8 +118,7 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="bg-secondary px-3 py-1 rounded text-sm font-medium hover:bg-secondary/80 flex items-center text-white"
-                      >
+                        className="bg-secondary px-3 py-1 rounded text-sm font-medium hover:bg-secondary/80 flex items-center text-white">
                         Get Directions
                         <ExternalLink className="h-3 w-3 ml-1" />
                       </a>
@@ -134,7 +127,7 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
                 </Popup>
               </Marker>
             ) : null,
-          )} */}
+          )}
         </MapContainer>
       </div>
 

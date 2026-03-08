@@ -77,16 +77,19 @@ export default function BusinessCard({ business }: { business: any }) {
 
   const router = useRouter();
 
-  const rating = 4;
-  const totalReviews = 2000;
+  const rating =
+    business?.reviews?.reduce(
+      (acc: any, review: any) => acc + review.rating,
+      0,
+    ) ?? 0;
+  const totalReviews = business?.reviews?.length ?? "no rating yet";
 
   const categoryInfo = getCategoryInfo();
 
   return (
     <div
       className=" overflow-hidden group cursor-pointer"
-      onClick={() => router.push(`/businesses/${business._id}`)}
-    >
+      onClick={() => router.push(`/businesses/${business._id}`)}>
       <div className="relative w-full h-56 md:h-60 rounded-xl overflow-hidden group">
         <Image
           width={500}

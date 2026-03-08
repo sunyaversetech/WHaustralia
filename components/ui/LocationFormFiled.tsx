@@ -110,8 +110,6 @@ export function LocationFormField({ form }: { form: any }) {
     setResults([]);
   };
 
-  console.log(form.getValues());
-
   return (
     <FormField
       control={form.control}

@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
     await connectToDb();
 
     const { searchParams } = new URL(request.url);
-
     const rawCategory = searchParams.get("category") || "";
     const rawSearch = searchParams.get("search") || "";
 
@@ -30,20 +29,31 @@ export async function GET(request: NextRequest) {
       query.name = { $regex: safeSearch, $options: "i" };
     }
 
-    const businesses = await User.find(query).sort({
-      createdAt: -1,
-    });
+    const businesses = await User.find(query).sort({ createdAt: -1 }).lean();
 
-    // const reviews = await Review.find({
-    //   bussiness_id: { $in: businesses.map((b) => b._id) },
-    // }).sort({
-    //   createdAt: -1,
-    // });
+    const businessIds = businesses.map((b) => b._id);
+    const reviews = await Review.find({
+      business_id: { $in: businessIds },
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const businessesWithReviews = businesses.map((business) => {
+      const businessIdStr = business._id?.toString();
+      return {
+        ...business,
+        reviews: reviews.filter((review) => {
+          const reviewBusinessIdStr = review.business_id?.toString();
+
+          return reviewBusinessIdStr === businessIdStr;
+        }),
+      };
+    });
 
     return NextResponse.json(
       {
-        data: businesses,
-        message: "Businesses retrieved successfully",
+        data: businessesWithReviews,
+        message: "Businesses and reviews retrieved successfully",
       },
       { status: 200 },
     );

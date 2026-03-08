@@ -20,7 +20,7 @@ export default function BusinessesClientPage() {
   const { data, isLoading } = useGetBusiness();
   const searchParams = useSearchParams();
   const view = searchParams.get("view") || "list";
-
+  console.log("view", data);
   return (
     // <div className="min-h-screen bg-gradient-modern relative">
     //   <div className="relative z-10">
