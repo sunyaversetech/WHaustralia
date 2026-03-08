@@ -1,13 +1,9 @@
 "use client";
-import dynamic from "next/dynamic";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  MapPin,
-  CheckCircle,
   Mail,
   Tag,
-  Link,
   ChevronLeft,
   BadgeCheck,
   Dot,
@@ -19,13 +15,7 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useGetSingleBusiness } from "@/services/business.service";
 import BusinessReviewSection from "@/components/Business/Comment";
-
-const Map = dynamic(() => import("./Map"), {
-  ssr: false,
-  loading: () => (
-    <div className="h-[400px] w-full bg-slate-100 animate-pulse rounded-xl" />
-  ),
-});
+import Map from "./Map";
 
 const rating = 4;
 const totalReviews = 2000;
@@ -47,14 +37,13 @@ export default function BusinessPage() {
     abn_number: "12 345 678 910",
   };
 
+  console.log(data);
+
   return (
     <div className="container-modern mx-auto p-6">
-      {/* business title and image container */}
       <div className="flex flex-col md:flex-col">
-        {/* Business title & actions */}
         <div className="order-2 md:order-1 mt-4 md:mt-0 mb-4">
           <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4">
-            {/* Heading */}
             <div className="flex items-center gap-2 sm:gap-4">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
                 {data?.data.business_name}
@@ -64,7 +53,6 @@ export default function BusinessPage() {
               )}
             </div>
 
-            {/* Like & Share buttons - desktop */}
             <div className="hidden flex items-center gap-2 md:flex md:items-center md:gap-2">
               <button className="flex items-center justify-center p-2 border rounded-full hover:bg-primary/10 transition">
                 <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
@@ -76,9 +64,7 @@ export default function BusinessPage() {
             </div>
           </div>
 
-          {/* Business rating & info */}
           <div className="mt-3 space-y-2 sm:space-y-0 sm:flex sm:items-center sm:gap-2 text-sm text-muted-foreground flex-wrap">
-            {/* Rating */}
             <div className="flex items-center gap-1 sm:gap-2">
               <span className="font-medium text-foreground">
                 {rating.toFixed(1)}
@@ -177,14 +163,17 @@ export default function BusinessPage() {
 
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Our Location</h2>
-            {/* {data?.data?.location && data?.data?.location ? (
+            {data?.data?.latitude && data?.data?.longitude ? (
               <Map
-                location={data?.data?.location ?? ""}
-                businessName={business.business_name}
+                latitude={data.data.latitude}
+                longitude={data.data.longitude}
+                businessName={data.data.business_name ?? ""}
               />
             ) : (
-              "No Map For this Business"
-            )} */}
+              <div className="h-[200px] flex items-center justify-center bg-slate-50 rounded-xl border border-dashed">
+                No Map Location available
+              </div>
+            )}
           </div>
           <BusinessReviewSection />
         </div>

@@ -2,6 +2,7 @@
 import { SessionProvider, useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import LoadingPage from "../Loading";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const { data: session, status } = useSession();
@@ -30,11 +31,7 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   }, [status, pathname, router, session]);
 
   if (status === "loading") {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        Loading...
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   return <>{children}</>;

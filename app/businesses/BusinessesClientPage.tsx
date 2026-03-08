@@ -1,16 +1,14 @@
 "use client";
 
 import BusinessCard from "@/components/cards/business-card";
-import { Calendar, ChevronLeft, Link, Loader2 } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 import dynamic from "next/dynamic";
 import BusinessHeader from "@/components/BusinessFilter";
 import { useGetBusiness } from "@/services/business.service";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useSearchParams } from "next/navigation";
-import FreshaSearchBar from "@/components/Business/Search";
-import WhSearchBar from "@/components/Business/Search";
-import { useGetReview } from "@/services/review.service";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const BusinessMap = dynamic(() => import("@/components/business-map"), {
   ssr: false,
@@ -20,7 +18,6 @@ export default function BusinessesClientPage() {
   const { data, isLoading } = useGetBusiness();
   const searchParams = useSearchParams();
   const view = searchParams.get("view") || "list";
-  console.log("view", data);
   return (
     // <div className="min-h-screen bg-gradient-modern relative">
     //   <div className="relative z-10">
@@ -205,11 +202,10 @@ export default function BusinessesClientPage() {
         <Tabs value={view}>
           <TabsContent value="list">
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center">
-                <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
-                <p className="text-sm text-neutral-500">
-                  Loading your events...
-                </p>
+              <div className="flex  items-center gap-2   mt-5">
+                <Skeleton className="h-72 w-96 mb-4 animate-pulse rounded-xl" />
+                <Skeleton className="h-72 w-96 mb-4 animate-pulse" />
+                <Skeleton className="h-72 w-96 mb-4 animate-pulse" />
               </div>
             ) : data?.data.length === 0 ? (
               <div className=" mt-8 p-20 text-center bg-white rounded-3xl border-2 border-dashed border-neutral-200">

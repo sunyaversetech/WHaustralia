@@ -12,6 +12,7 @@ export async function GET(req: NextRequest, { params }: Props) {
       id,
       "-accpetalltermsandcondition -password -provider -googleId",
     ).sort({ createdAt: -1 });
+
     return NextResponse.json(
       { data: business, message: "Businesses retrieved successfully" },
       { status: 200 },

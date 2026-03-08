@@ -13,6 +13,8 @@ export type UserBusinessType = {
   community: string;
   community_name: string;
   image: string;
+  longitude?: number;
+  latitude?: number;
 
   business_name?: string;
   business_category?: string;

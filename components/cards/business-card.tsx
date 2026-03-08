@@ -99,8 +99,6 @@ export default function BusinessCard({ business }: { business: any }) {
           className="absolute inset-0 w-full h-full object-cover"
         />
 
-        {/* <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" /> */}
-
         <div className="relative z-10 h-full w-full flex flex-col justify-between p-4 text-white">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded-full bg-white text-primary">
