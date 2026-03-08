@@ -7,6 +7,7 @@ import { useCityFilter } from "@/contexts/city-filter-context";
 import { filterByCity } from "@/lib/utils/city-filter";
 import { useGetAllEvents } from "@/services/event.service";
 import EventHeader from "@/components/EventFilter";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EventsPageClient() {
   const { selectedCity } = useCityFilter();
@@ -43,11 +44,11 @@ export default function EventsPageClient() {
     <div className="min-h-screen bg-neutral-50 pb-20">
       <div className="container-modern py-8">
         <EventHeader />
-
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center">
-            <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
-            <p className="text-sm text-neutral-500">Loading your events...</p>
+          <div className="flex  items-center gap-2   mt-5">
+            <Skeleton className="h-72 w-96 mb-4 animate-pulse rounded-xl" />
+            <Skeleton className="h-72 w-96 mb-4 animate-pulse" />
+            <Skeleton className="h-72 w-96 mb-4 animate-pulse" />
           </div>
         ) : events.length === 0 ? (
           <div className=" mt-8 p-20 text-center bg-white rounded-3xl border-2 border-dashed border-neutral-200">

@@ -27,9 +27,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
-const rating = 4;
-const totalReviews = 2000;
-
 export default function BusinessPage() {
   const params = useParams();
   const { id } = params;

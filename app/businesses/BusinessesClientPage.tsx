@@ -198,7 +198,6 @@ export default function BusinessesClientPage() {
     <div className="min-h-screen bg-neutral-50 pb-20">
       <div className="container-modern py-8">
         <BusinessHeader />
-
         <Tabs value={view}>
           <TabsContent value="list">
             {isLoading ? (

@@ -29,6 +29,7 @@ import {
 } from "@/services/redeemandverify.service";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function isPromise<T>(value: any): value is Promise<T> {
   return !!value && typeof value.then === "function";
@@ -42,6 +43,7 @@ export default function DealDetailPage({ params }: { params: { id: string } }) {
     unwrappedParams = params;
   }
   const { data: deal, isLoading } = useGetSingleDeal(unwrappedParams.id);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { data: session } = useSession();
   const [redemptionResult, setRedemptionResult] = useState<{
@@ -108,10 +110,13 @@ export default function DealDetailPage({ params }: { params: { id: string } }) {
 
   if (isLoading)
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin h-8 w-8" />
+      <div className="min-h-screen flex flex-col -mt-35 items-center justify-center">
+        <Skeleton className="h-96 w-96 md:w-160 mb-4 animate-pulse rounded-xl" />
+        <Skeleton className="h-52 w-96 md:w-160 mb-4 animate-pulse rounded-xl" />
       </div>
     );
+
+  if (!deal?.data) return <DealNotFoundPage />;
 
   return (
     <div className="min-h-screen bg-gray-50">

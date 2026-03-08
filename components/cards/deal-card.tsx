@@ -59,7 +59,9 @@ export default function DealCard({ deal }: { deal: DealsGetValues }) {
     (item: { _id: string }) => item._id.toString() === deal._id?.toString(),
   );
   return (
-    <div className="block">
+    <div
+      className="block cursor-pointer"
+      onClick={() => router.push(`/deals/${deal._id}`)}>
       <div className="relative w-full bg-gray-200 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-300 active:scale-95">
         <div className="absolute top-1/2 -left-2 w-4 h-4 bg-white border border-gray-200 rounded-full transform -translate-y-1/2 z-0"></div>
         <div className="absolute top-1/2 -right-2 w-4 h-4 bg-white border border-gray-200 rounded-full transform -translate-y-1/2 z-0"></div>
@@ -77,7 +79,10 @@ export default function DealCard({ deal }: { deal: DealsGetValues }) {
               </div>
               <button
                 disabled={isPending}
-                onClick={handleAddRemoveFavorite}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddRemoveFavorite();
+                }}
                 className={`self-start p-2  rounded-lg transition-all duration-200 ${
                   isDealFavorite
                     ? "text-red-500 bg-red-50"
