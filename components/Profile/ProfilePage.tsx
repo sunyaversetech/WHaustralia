@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import {
   Trash2,
   Plus,
@@ -61,6 +61,11 @@ const ProfilePage = ({ userData }: { userData: any }) => {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "business_service",
+  });
+
+  const profileImage = useWatch({
+    control: form.control,
+    name: "image",
   });
 
   const onSubmit = async (data: any) => {
@@ -128,12 +133,10 @@ const ProfilePage = ({ userData }: { userData: any }) => {
                   <Form {...form}>
                     <form
                       onSubmit={form.handleSubmit(onSubmit)}
-                      className="space-y-6"
-                    >
-                      {/* Image Upload Placeholder */}
+                      className="space-y-6">
                       <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
                         <Avatar className="w-16 h-16">
-                          <AvatarImage src={form.watch("image")} />
+                          <AvatarImage src={profileImage} />
                           <AvatarFallback>
                             <UserIcon />
                           </AvatarFallback>
@@ -207,8 +210,7 @@ const ProfilePage = ({ userData }: { userData: any }) => {
                                   <FormLabel>Category</FormLabel>
                                   <Select
                                     onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                  >
+                                    defaultValue={field.value}>
                                     <FormControl>
                                       <SelectTrigger>
                                         <SelectValue />
@@ -240,22 +242,19 @@ const ProfilePage = ({ userData }: { userData: any }) => {
                                 size="sm"
                                 onClick={() =>
                                   append({ name: "", price_category: "hr" })
-                                }
-                              >
+                                }>
                                 <Plus className="w-3 h-3 mr-1" /> Add
                               </Button>
                             </div>
                             {fields.map((field, index) => (
                               <div
                                 key={field.id}
-                                className="p-4 border rounded-md bg-white relative"
-                              >
+                                className="p-4 border rounded-md bg-white relative">
                                 <Button
                                   variant="ghost"
                                   size="icon"
                                   className="absolute top-1 right-1 h-7 w-7"
-                                  onClick={() => remove(index)}
-                                >
+                                  onClick={() => remove(index)}>
                                   <Trash2 className="w-4 h-4 text-red-500" />
                                 </Button>
                                 <div className="grid grid-cols-2 gap-2">
@@ -327,8 +326,7 @@ const ProfilePage = ({ userData }: { userData: any }) => {
             {userData.business_service.map(({ service, i }: any) => (
               <div
                 key={i}
-                className="p-4 border rounded-xl shadow-sm hover:border-blue-200 transition-colors"
-              >
+                className="p-4 border rounded-xl shadow-sm hover:border-blue-200 transition-colors">
                 <h4 className="font-bold text-lg">{service.name}</h4>
                 <Badge variant="secondary" className="mt-1 mb-2">
                   Per {service.price_category}
