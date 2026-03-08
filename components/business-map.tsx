@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -55,6 +55,28 @@ function LocateUser({
   );
 }
 
+function MapController({ selectedBusiness }: { selectedBusiness: any }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (
+      selectedBusiness &&
+      selectedBusiness.latitude &&
+      selectedBusiness.longitude
+    ) {
+      map.flyTo(
+        [Number(selectedBusiness.latitude), Number(selectedBusiness.longitude)],
+        15,
+        {
+          duration: 3.5,
+        },
+      );
+    }
+  }, [selectedBusiness, map]);
+
+  return null;
+}
+
 export default function BusinessMap({ businesses }: { businesses: any }) {
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(
     null,
@@ -77,7 +99,7 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution="&copy; OpenStreetMap contributors"
           />
-
+          <MapController selectedBusiness={selectedBusiness} />
           <LocateUser setUserLocation={setUserLocation} />
 
           {userLocation && (
@@ -131,28 +153,30 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
         </MapContainer>
       </div>
 
-      {/* Business List */}
       <div className="p-4">
         <h3 className="font-medium text-lg mb-3">All Locations</h3>
 
-        {/* <div className="space-y-2 max-h-[300px] overflow-y-auto">
+        <div className="space-y-2 max-h-[300px] flex gap-2 flex-wrap overflow-y-auto">
           {businesses.map((business: any) => (
             <div
               key={business.id}
-              className={`p-3 rounded-lg cursor-pointer ${
+              className={`p-3 max-w-[200px] h-[50px] overflow-hidden rounded-lg cursor-pointer ${
                 selectedBusiness?.id === business.id
                   ? "bg-primary/10 border-primary/30"
                   : "bg-neutral/50 hover:bg-neutral/100 border-neutral/200"
               } border`}
-              onClick={() => setSelectedBusiness(business)}
-            >
+              onClick={() => setSelectedBusiness(business)}>
               <div className="flex items-start">
                 <MapPin className="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" />
 
                 <div>
-                  <h4 className="font-medium">{business.name}</h4>
+                  <h4 className="font-medium w-[100x] truncate">
+                    <span className="inline-block w-[150px] truncate">
+                      {business.name}
+                    </span>
+                  </h4>
 
-                  <p className="text-sm text-gray-600">{business.location}</p>
+                  {/* <p className="text-sm text-gray-600">{business.location}</p> */}
 
                   {business.phone && (
                     <p className="text-sm text-gray-600 mt-1">
@@ -163,7 +187,7 @@ export default function BusinessMap({ businesses }: { businesses: any }) {
               </div>
             </div>
           ))}
-        </div> */}
+        </div>
       </div>
     </div>
   );
