@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { Calendar, MapPin, Heart, Loader2 } from "lucide-react";
+import { Calendar, MapPin, Heart, Loader2, Ticket } from "lucide-react";
 import { useFavorites } from "@/contexts/favorites-context";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -66,9 +66,11 @@ const EventCard = memo(function EventCard({ event }: { event: any }) {
 
   return (
     <div
-      className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer border border-neutral-100"
-      onClick={() => router.push(`/events/${eventId}`)}>
-      <div className="relative h-48 w-full">
+      className="group relative overflow-hidden rounded-lg cursor-pointer"
+      onClick={() => router.push(`/events/${eventId}`)}
+    >
+      {/* Full-Image Background */}
+      <div className="relative h-56 md:h-60 w-full">
         <Image
           width={500}
           height={500}
@@ -76,6 +78,18 @@ const EventCard = memo(function EventCard({ event }: { event: any }) {
           alt={event.title}
           className="w-full h-full object-cover"
         />
+
+        {/* Gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+
+        {/* Category Badge - Top Left */}
+        <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-semibold px-2 py-1 rounded-lg shadow-lg">
+          {event.category
+            ? event.category.charAt(0).toUpperCase() + event.category.slice(1)
+            : "Event"}
+        </div>
+
+        {/* Favorite Button - Top Right */}
         <button
           disabled={isPending}
           onClick={(e) => {
@@ -83,52 +97,72 @@ const EventCard = memo(function EventCard({ event }: { event: any }) {
             e.preventDefault();
             handleAddRemoveFavorite();
           }}
-          className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors disabled:opacity-70">
+          className="absolute top-3 right-3 p-2 bg-black/10 backdrop-blur-md border border-white/30 rounded-full
+           transition-colors duration-200 shadow-lg group/fav hover:bg-white/30 disabled:opacity-70"
+        >
           {isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
+            <Loader2 className="h-4 w-4 animate-spin text-white" />
           ) : (
             <Heart
-              className={cn(
-                "h-4 w-4 transition-all",
+              className={`h-5 w-5 transition-colors duration-200 ${
                 isEventFavorite
-                  ? "text-red-500 scale-110"
-                  : "text-neutral-600 hover:text-neutral-900",
-              )}
-              fill={isEventFavorite ? "red" : "none"}
+                  ? "text-red-500 fill-red-500"
+                  : "text-white group-hover/fav:text-primary"
+              }`}
             />
           )}
         </button>
-      </div>
 
-      <div className="p-4">
-        <div className="inline-block px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase mb-2">
-          {event.category || "Event"}
-        </div>
+        {/* Glassmorphism Bottom Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 bg-black/10 backdrop-blur-sm border-t border-white/20">
+          <div className="py-3 px-4 md:p-4">
+            {/* Event Title */}
+            <h3 className="text-white font-bold text-sm md:text-md line-clamp-2 mb-2 md:mb-3 leading-tight">
+              {event.title}
+            </h3>
 
-        <h3 className="font-bold text-gray-800 text-lg mb-3 line-clamp-1">
-          {event.title}
-        </h3>
+            {/* Meta Info Row */}
+            <div className="flex items-center justify-between text-white/90 text-sm">
+              <div className="space-x-6 max-w-[70%]">
+                <div className="flex items-center truncate pb-1">
+                  <MapPin className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+                  <span className="truncate text-xs md:text-sm">
+                    {event.venue || "Venue TBA"}
+                  </span>
+                </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center text-neutral-600 text-sm">
-            <MapPin className="h-3.5 w-3.5 mr-2 text-primary flex-shrink-0" />
-            <span className="truncate">{event.venue || "Venue TBA"}</span>
+                <div className="flex items-center">
+                  <Calendar className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+                  <span className="truncate text-xs md:text-sm">
+                    {dateDisplay}
+                  </span>
+                </div>
+              </div>
+
+              {/* Ticket Button */}
+              {event.ticket_price && event.ticket_price > 0 ? (
+                <a
+                  href={event.ticketUrl || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-2 py-1 md:px-3 md:py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg hover:bg-white/30 transition-colors duration-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Ticket className="h-4 w-4 text-white" />
+                  <span className="text-white font-medium md:text-sm">
+                    ${event.ticket_price}
+                  </span>
+                </a>
+              ) : (
+                <div className="flex items-center gap-2 px-2 py-1 md:px-3 md:py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-md transition-colors duration-200">
+                  <Ticket className="h-4 w-4 text-white" />
+                  <span className="text-white font-medium md:text-sm">
+                    FREE
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="flex items-center text-neutral-600 text-sm">
-            <Calendar className="h-3.5 w-3.5 mr-2 text-primary flex-shrink-0" />
-            <span>{dateDisplay}</span>
-          </div>
-        </div>
-
-        <div className="mt-4 pt-4 border-t flex justify-between items-center">
-          <span className="text-xs font-semibold text-neutral-400">
-            {event.community || "General"}
-          </span>
-          <span className="text-sm font-bold text-secondary">
-            {event.ticket_price && event.ticket_price > 0
-              ? `$${event.ticket_price}`
-              : "FREE"}
-          </span>
         </div>
       </div>
     </div>

@@ -67,7 +67,7 @@ export default function EventDetailPage() {
   }
 
   return (
-    <div className="container-modern mx-auto p-6 pb-20 md:pb-0">
+    <div className="container-modern min-h-screen bg-gradient-modern relative">
       {/* Event Header Card */}
       <div className="flex flex-col md:flex-col">
         {/* Event Info */}
@@ -129,12 +129,7 @@ export default function EventDetailPage() {
 
             {/* Favorite/Share Buttons for Mobile */}
             <div className="absolute inset-0 flex items-start justify-between p-3 md:hidden">
-              <div>
-                <ChevronLeft
-                  className="h-8 w-8 cursor-pointer rounded-full border  p-1.5 
-                 text-primary bg-white transition-all hover:scale-105 active:scale-95"
-                />
-              </div>
+              <div></div>
               <div className="flex gap-2">
                 <button className="flex items-center justify-center p-2 border bg-white rounded-full transition-all hover:scale-105 active:scale-95">
                   <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-primary transition-all" />
