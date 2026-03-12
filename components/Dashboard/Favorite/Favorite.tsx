@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export default function FavoritesPage() {
+  const router = useRouter();
   const { data: favoritesData, isLoading } = useGetUserFavroite();
 
   const favorites = favoritesData?.data || {
@@ -29,7 +30,6 @@ export default function FavoritesPage() {
     services: [],
     deals: [],
   };
-  const router = useRouter();
 
   if (isLoading) return <FavoritesSkeleton />;
 
@@ -191,7 +191,8 @@ function FavoriteCard({ item, type }: { item: any; type: string }) {
               handleAddRemoveFavorite();
             }}
             variant={"outline"}
-            className=" cursor-pointer">
+            className=" cursor-pointer"
+          >
             {isPending ? (
               <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
             ) : (
