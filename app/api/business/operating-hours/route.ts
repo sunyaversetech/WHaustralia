@@ -29,10 +29,7 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } },
-) {
+export async function POST(req: Request) {
   try {
     await connectToDb();
     const body = await req.json();
