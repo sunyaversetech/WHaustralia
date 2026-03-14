@@ -106,7 +106,7 @@ const Sidebar = () => {
         {
           name: "Settings",
           icon: Settings,
-          link: "/dashboard/",
+          link: "/dashboard/settings",
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/settings"),
         },
@@ -125,8 +125,7 @@ const Sidebar = () => {
                   border-r 
                    flex-col 
                   font-sans text-sm 
-                  transition-all duration-300"
-    >
+                  transition-all duration-300">
       <div className="flex-1 overflow-y-auto p-2 md:p-4">
         <Link href="/" className="flex items-center justify-center ">
           <Image
@@ -188,8 +187,7 @@ const Sidebar = () => {
                 item.active
                   ? "bg-slate-100 text-black"
                   : "hover:bg-gray-600 hover:text-white"
-              }`}
-                  >
+              }`}>
                     {/* ICON */}
                     <item.icon size={22} strokeWidth={1.5} />
 

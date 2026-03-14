@@ -1,0 +1,72 @@
+import { connectToDb } from "@/lib/db";
+import User from "@/server/models/Auth.model";
+import { OperatingHours } from "@/server/models/OperatingHour.model";
+import { Review } from "@/server/models/Review.model";
+import { NextRequest, NextResponse } from "next/server";
+
+type Props = { params: Promise<{ id: string }> };
+export async function GET(req: NextRequest, { params }: Props) {
+  try {
+    await connectToDb();
+    const { id } = await params;
+    const business = await User.findOne(
+      {
+        _id: id,
+      },
+      "-accpetalltermsandcondition -password -provider -googleId",
+    )
+      .sort({ createdAt: -1 })
+      .lean();
+
+    if (!business) {
+      return NextResponse.json(
+        { error: "Business not found" },
+        { status: 404 },
+      );
+    }
+
+    const review = await Review.find({ business_id: business._id }).sort({
+      createdAt: -1,
+    });
+
+    const hours = await OperatingHours.findOne({ business_id: business._id });
+
+    return NextResponse.json(
+      {
+        data: { ...business, review: review, hours: hours },
+        message: "Businesses retrieved successfully",
+      },
+      { status: 200 },
+    );
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+//  owner: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: "User",
+//       unique: true,
+//     },
+//     business_name: {
+//       type: String,
+//       required: true,
+//       trim: true,
+//     },
+//     business_category: {
+//       type: String,
+//       required: true,
+//     },
+//     service_category: {
+//       type: String,
+//       required: true,
+//     },
+//     business_service: [ServiceSchema],
+//     location: {
+//       address: { type: String, required: true },
+//       city: { type: String },
+//       coordinates: {
+//         lat: Number,
+//         lng: Number,
+//       },
+//     },

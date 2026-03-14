@@ -1,5 +1,6 @@
 import { connectToDb } from "@/lib/db";
 import User from "@/server/models/Auth.model";
+import { OperatingHours } from "@/server/models/OperatingHour.model";
 import { Review } from "@/server/models/Review.model";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -32,9 +33,11 @@ export async function GET(req: NextRequest, { params }: Props) {
       createdAt: -1,
     });
 
+    const hours = await OperatingHours.findOne({ business_id: business._id });
+
     return NextResponse.json(
       {
-        data: { ...business, review: review },
+        data: { ...business, review: review, hours: hours },
         message: "Businesses retrieved successfully",
       },
       { status: 200 },

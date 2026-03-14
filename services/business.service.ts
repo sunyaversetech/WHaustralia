@@ -1,6 +1,9 @@
 import { useFetcher } from "@/lib/generic.service";
 import { ApiResponseType } from "./apitypes";
 import { useParams, useSearchParams } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { Post } from "@/lib/action";
+import { OperatingHourPostType } from "@/components/Dashboard/Settings/OperatingHours";
 
 export type UserBusinessType = {
   _id?: string;
@@ -52,6 +55,62 @@ export const useGetSingleBusiness = () => {
   return useFetcher<ApiResponseType<UserBusinessType>>(
     ["getbusiness", id],
     null,
-    `/api/business/${id}`,
+    `/api/business/single/${id}`,
   );
 };
+export const useGetSingleDashboardBusiness = (id: string) => {
+  return useFetcher<ApiResponseType<UserBusinessType>>(
+    ["getbusiness", id],
+    null,
+    `/api/business/getwithid/${id}`,
+  );
+};
+
+export const useUpdateOperatingHours = () => {
+  return useMutation<
+    ApiResponseType<OperatingHourPostType>,
+    any,
+    OperatingHourPostType
+  >({
+    mutationKey: ["updateOperatingHours"],
+    mutationFn: (data: OperatingHourPostType) =>
+      Post<OperatingHourPostType, ApiResponseType<OperatingHourPostType>>({
+        url: "/api/business/operating-hours",
+        data: data,
+      }),
+  });
+};
+
+export const useGetOperatingHours = () => {
+  return useFetcher<ApiResponseType<OperatingHourPostType>>(
+    ["getOperatingHours"],
+    null,
+    `/api/business/operating-hours`,
+  );
+};
+
+export const useUpadteABN = () => {
+  return useMutation<
+    ApiResponseType<{ abn_number: string }>,
+    any,
+    { abn_number: string }
+  >({
+    mutationKey: ["updateABN"],
+    mutationFn: (data: { abn_number: string }) =>
+      Post<{ abn_number: string }, ApiResponseType<{ abn_number: string }>>({
+        url: "/api/business/abn",
+        data: data,
+      }),
+  });
+};
+
+// export const useCreateDeals = () => {
+//   return useMutation<ApiResponseType<DealFormValues>, any, DealFormValues>({
+//     mutationKey: ["createDeal"],
+//     mutationFn: (data: DealFormValues) =>
+//       Post<DealFormValues, ApiResponseType<DealFormValues>>({
+//         url: "/api/deals",
+//         data: data,
+//       }),
+//   });
+// };
