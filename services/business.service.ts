@@ -4,6 +4,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { Post } from "@/lib/action";
 import { OperatingHourPostType } from "@/components/Dashboard/Settings/OperatingHours";
+import { BusinessHoursData } from "@/components/Business/SingleBusinessPage/Hours";
 
 export type UserBusinessType = {
   _id?: string;
@@ -12,6 +13,7 @@ export type UserBusinessType = {
   email: string;
   city: string;
   city_name: string;
+  hours?: BusinessHoursData;
   location: string;
   community: string;
   community_name: string;

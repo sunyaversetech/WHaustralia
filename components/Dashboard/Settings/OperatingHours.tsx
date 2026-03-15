@@ -70,9 +70,10 @@ export function BusinessHoursForm() {
 
   const { mutate } = useUpdateOperatingHours();
   const { data: session } = useSession();
+  console.log("data", data);
 
   useEffect(() => {
-    if (data) {
+    if (data?.data && data?.data !== undefined) {
       const mergedSchedule = DEFAULT_SCHEDULE.map((defaultDay) => {
         const existingDay = data.data.schedule?.find(
           (d: any) => d.day === defaultDay.day,

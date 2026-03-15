@@ -113,7 +113,7 @@ export default function EventMap({ businesses }: { businesses: any }) {
           {businesses.map((business: any) =>
             business.latitude && business.longitude ? (
               <Marker
-                key={business.id}
+                key={business._id}
                 position={[
                   Number(business.latitude),
                   Number(business.longitude),
@@ -161,7 +161,7 @@ export default function EventMap({ businesses }: { businesses: any }) {
         <div className="space-y-2 max-h-[300px] flex gap-2 flex-wrap overflow-y-auto">
           {businesses.map((business: any) => (
             <div
-              key={business.id}
+              key={business._id}
               className={`p-3 max-w-[200px] h-[50px] overflow-hidden rounded-lg cursor-pointer ${
                 selectedBusiness?.id === business.id
                   ? "bg-primary/10 border-primary/30"

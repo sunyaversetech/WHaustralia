@@ -42,7 +42,6 @@ export async function POST(req: Request) {
       },
       { upsert: true, new: true, runValidators: true },
     );
-
     return NextResponse.json(updatedHours, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

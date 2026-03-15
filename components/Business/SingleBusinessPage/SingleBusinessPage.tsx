@@ -1,6 +1,6 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Mail,
   Tag,
@@ -27,6 +27,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import Loading from "@/app/businesses/loading";
+import BusinessHours from "./Hours";
 
 export default function BusinessPage() {
   const { data, isLoading } = useGetSingleBusiness();
@@ -105,8 +106,6 @@ export default function BusinessPage() {
 
   if (isLoading) return <Loading />;
 
-  console.log("data", data);
-
   return (
     <div className="container-modern mx-auto p-6">
       <div className="flex flex-col md:flex-col">
@@ -176,10 +175,6 @@ export default function BusinessPage() {
             </div>
 
             <Dot className="hidden md:block h-4 w-4" />
-
-            <div className="font-medium text-red-500">
-              Closed - Opens 9:00 am
-            </div>
 
             <Dot className="hidden md:block h-4 w-4" />
 
@@ -283,6 +278,12 @@ export default function BusinessPage() {
         </div>
 
         <div className="space-y-6">
+          <Card className="bg-slate-50 border-none">
+            <CardContent className="pt-6 ">
+              <h3 className="font-bold mb-2">Business Operating Hours</h3>
+              <BusinessHours hours={data?.data?.hours} />
+            </CardContent>
+          </Card>
           <Card className="bg-slate-50 border-none">
             <CardContent className="pt-6 ">
               <h3 className="font-bold mb-2">Business Status</h3>

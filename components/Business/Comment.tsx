@@ -115,7 +115,6 @@ export default function BusinessReviewSection({
     );
   };
 
-  console.log("reviews", reviews);
   return (
     <div className="max-w-4xl mx-auto space-y-10 py-10">
       <Card className="border-slate-200 shadow-sm overflow-hidden">
