@@ -150,7 +150,7 @@ export default function EventHeader() {
                 <span className="flex items-center gap-2">Nepali</span>
               </SelectItem>
 
-              <SelectItem value="Indian">
+              {/* <SelectItem value="Indian">
                 <span className="flex items-center gap-2">Indian</span>
               </SelectItem>
 
@@ -164,7 +164,7 @@ export default function EventHeader() {
 
               <SelectItem value="Others">
                 <span className="flex items-center gap-2">Others</span>
-              </SelectItem>
+              </SelectItem> */}
             </SelectContent>
           </Select>
         </div>

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -39,6 +39,12 @@ export type NavGroup = {
 const Sidebar = () => {
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentCity = searchParams.get("city");
+  const buildPath = (href: string) => {
+    if (!currentCity) return href;
+    return `${href}?city=${currentCity}`;
+  };
 
   const menuData: NavGroup[] = [
     {
@@ -47,21 +53,21 @@ const Sidebar = () => {
         {
           name: "dashboard",
           icon: LayoutDashboard,
-          link: "/dashboard",
+          link: buildPath("/dashboard"),
           hasDropdown: false,
           active: pathname === "/dashboard",
         },
         {
           name: "booking",
           icon: Calendar,
-          link: "/dashboard/bookings",
+          link: buildPath("/dashboard/bookings"),
           hasDropdown: false,
           active: pathname === "/dashboard/bookings",
         },
         {
           name: "deals",
           icon: BadgeDollarSign,
-          link: "/dashboard/deals",
+          link: buildPath("/dashboard/deals"),
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/deals"),
         },
@@ -80,7 +86,7 @@ const Sidebar = () => {
         {
           name: "inventory",
           icon: CirclePile,
-          link: "/dashboard/inventory",
+          link: buildPath("/dashboard/inventory"),
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/inventory"),
         },
@@ -92,21 +98,21 @@ const Sidebar = () => {
         {
           name: "profile",
           icon: User,
-          link: "/dashboard/profile",
+          link: buildPath("/dashboard/profile"),
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/profile"),
         },
         {
           name: "Favorites",
           icon: HeartPlus,
-          link: "/dashboard/favorite",
+          link: buildPath("/dashboard/favorite"),
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/favorite"),
         },
         {
           name: "Settings",
           icon: Settings,
-          link: "/dashboard/settings",
+          link: buildPath("/dashboard/settings"),
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/settings"),
         },
@@ -127,7 +133,9 @@ const Sidebar = () => {
                   font-sans text-sm 
                   transition-all duration-300">
       <div className="flex-1 overflow-y-auto p-2 md:p-4">
-        <Link href="/" className="flex items-center justify-center ">
+        <Link
+          href={buildPath("/")}
+          className="flex items-center justify-center ">
           <Image
             src="/wha/logo2.png"
             alt="Whats Happening Australia Logo"

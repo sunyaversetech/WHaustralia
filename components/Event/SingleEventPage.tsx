@@ -2,25 +2,22 @@
 import {
   Calendar,
   MapPin,
-  Share2,
   Mail,
   Ticket,
   Sparkles,
   ChevronLeft,
   ExternalLink,
-  Check,
   Share,
-  BadgeCheck,
   Loader2,
   Heart,
   Dot,
+  Phone,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import FavoriteButton from "@/components/ui/favorite-button";
 import { useGetSingleEvent } from "@/services/event.service";
 import Image from "next/image";
-import { differenceInDays, format } from "date-fns";
+import { formatDate } from "date-fns";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -104,6 +101,8 @@ export default function EventDetailPage() {
   if (isLoading) {
     <LoadingPage />;
   }
+
+  console.log("event?.data?.dateRange?.from", event);
 
   return (
     <div className="container-modern mx-auto p-6 pb-20 md:pb-0">
@@ -240,13 +239,14 @@ export default function EventDetailPage() {
                       <p className="text-sm text-gray-500">Date & Time</p>
                       <p className="font-medium text-gray-800">
                         {" "}
-                        {event?.data?.dateRange?.from instanceof Date
-                          ? event.data?.dateRange.from.toLocaleDateString()
-                          : event?.data?.dateRange?.from}{" "}
+                        {event?.data?.dateRange?.from &&
+                          formatDate(
+                            event?.data?.dateRange?.from,
+                            "dd MMM yyyy",
+                          )}{" "}
                         -{" "}
-                        {event?.data?.dateRange?.to instanceof Date
-                          ? event.data?.dateRange.to.toLocaleDateString()
-                          : event?.data?.dateRange?.to}
+                        {event?.data?.dateRange?.to &&
+                          formatDate(event?.data?.dateRange?.to, "dd MMM yyyy")}
                       </p>
                     </div>
                   </div>
@@ -375,7 +375,7 @@ export default function EventDetailPage() {
                   </Button>
                 )}
 
-                <Button className="w-full">
+                <Button className="w-full" onClick={handleShare}>
                   <Share className="h-4 w-4  mr-2" />
                   Share
                 </Button>
@@ -399,18 +399,18 @@ export default function EventDetailPage() {
                     </a>
                   </div>
                 )}
-                {/* {event.contactPhone && (
+                {event?.data.phone_number && (
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-green-100 rounded-lg">
                       <Phone className="h-4 w-4 text-green-600" />
                     </div>
                     <a
-                      href={`tel:${event.contactPhone}`}
+                      href={`tel:${event.data.phone_number}`}
                       className="text-gray-700 hover:text-green-600 transition-colors">
-                      {event.contactPhone}
+                      {event.data.phone_number}
                     </a>
                   </div>
-                )} */}
+                )}
                 {/* {!event.contactEmail && !event.contactPhone && (
                   <div className="text-center py-4">
                     <p className="text-gray-500 text-sm">

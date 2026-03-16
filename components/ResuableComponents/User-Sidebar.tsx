@@ -7,7 +7,7 @@ import {
   Ticket,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 export type NavItem = {
@@ -27,6 +27,13 @@ export type NavGroup = {
 const UserSidebar = () => {
   const pathname = usePathname();
 
+  const searchParams = useSearchParams();
+  const currentCity = searchParams.get("city");
+  const buildPath = (href: string) => {
+    if (!currentCity) return href;
+    return `${href}?city=${currentCity}`;
+  };
+
   const menuData: NavGroup[] = [
     {
       groupLabel: "General",
@@ -34,14 +41,14 @@ const UserSidebar = () => {
         {
           name: "dashboard",
           icon: LayoutDashboard,
-          link: "/dashboard",
+          link: buildPath("/dashboard"),
           hasDropdown: false,
           active: pathname === "/dashboard",
         },
         {
           name: "events",
           icon: Ticket,
-          link: "/dashboard/events",
+          link: buildPath("/dashboard/events"),
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/events"),
         },
@@ -53,14 +60,14 @@ const UserSidebar = () => {
         {
           name: "profile",
           icon: User,
-          link: "/dashboard/profile",
+          link: buildPath("/dashboard/profile"),
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/profile"),
         },
         {
           name: "Favorites",
           icon: HeartPlus,
-          link: "/dashboard/favorite",
+          link: buildPath("/dashboard/favorite"),
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/favorite"),
         },
@@ -81,7 +88,9 @@ const UserSidebar = () => {
                   font-sans text-sm 
                   transition-all duration-300">
       <div className="flex-1 overflow-y-auto p-2 md:p-4">
-        <Link href="/" className="flex items-center justify-center ">
+        <Link
+          href={buildPath("/")}
+          className="flex items-center justify-center ">
           <Image
             src="/wha/logo2.png"
             alt="Whats Happening Australia Logo"

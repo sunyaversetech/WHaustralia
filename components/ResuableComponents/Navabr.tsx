@@ -39,6 +39,7 @@ export default function Navbar() {
     },
     [router, searchParams],
   );
+
   const buildPath = (href: string) => {
     if (!currentCity) return href;
     return `${href}?city=${currentCity}`;
@@ -46,7 +47,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b bg-white">
-      <Link href="/" className="flex items-center">
+      <Link href={buildPath("/")} className="flex items-center">
         <Image
           src="/wha/logo.png"
           alt="Whats Happening Australia Logo"
@@ -80,7 +81,7 @@ export default function Navbar() {
 
           {status === "authenticated" && (
             <Link
-              href="/dashboard"
+              href={buildPath("/dashboard")}
               className={`px-5 py-2 rounded-full transition-all duration-300 ease-in-out
         ${
           isActive("/dashboard")
@@ -129,12 +130,6 @@ export default function Navbar() {
               <SelectItem value="canberra">
                 <span className="flex items-center gap-2">
                   <MapPin className="h-6 w-6" /> Canberra
-                </span>
-              </SelectItem>
-
-              <SelectItem value="others">
-                <span className="flex items-center gap-2">
-                  <MapPin className="h-6 w-6" /> Others
                 </span>
               </SelectItem>
             </SelectContent>
