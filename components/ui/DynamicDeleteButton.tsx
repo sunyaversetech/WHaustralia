@@ -16,17 +16,23 @@ interface DeleteProps {
   text: string;
   onConfirm: () => void;
   isPending?: boolean;
+  header?: React.ReactNode | string;
 }
 
 export function DeleteConfirmDialog({
   text,
   onConfirm,
   isPending,
+  header,
 }: DeleteProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Trash2 size={15} className="cursor-pointer text-red-500" />
+        {header ? (
+          header
+        ) : (
+          <Trash2 size={15} className="cursor-pointer text-red-500" />
+        )}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

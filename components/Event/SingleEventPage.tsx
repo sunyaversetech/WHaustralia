@@ -16,7 +16,7 @@ import {
   Dot,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import FavoriteButton from "@/components/ui/favorite-button";
 import { useGetSingleEvent } from "@/services/event.service";
 import Image from "next/image";
@@ -28,11 +28,22 @@ import { toast } from "sonner";
 import { useState } from "react";
 import LoadingPage from "@/components/ResuableComponents/Loading";
 import { Button } from "../ui/button";
+import {
+  useCreateFavroite,
+  useGetUserFavroite,
+} from "@/services/favroite.service";
+import { useSession } from "next-auth/react";
+import { cn } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function EventDetailPage() {
   const param = useParams();
   const awaitedParams = param as { id: string };
+  const { data: session } = useSession();
+  const { mutate, isPending } = useCreateFavroite();
+  const router = useRouter();
   const { data: event, isLoading } = useGetSingleEvent(awaitedParams.id);
+  const queryClient = useQueryClient();
   const DefaultIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
     shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
@@ -41,6 +52,7 @@ export default function EventDetailPage() {
   });
 
   const [copied, setCopied] = useState(false);
+  const EventId = event?.data?._id;
 
   const handleShare = async () => {
     const shareData = {
@@ -62,6 +74,33 @@ export default function EventDetailPage() {
     }
   };
 
+  const handleAddRemoveFavorite = () => {
+    if (!session) {
+      toast.error("Please login to add to favorites");
+      router.push("/auth");
+      return;
+    }
+    mutate(
+      { item_id: EventId, item_type: "User" },
+      {
+        onSuccess: (msg) => {
+          router.refresh();
+          toast.success(msg.message);
+          queryClient.invalidateQueries({ queryKey: ["favroite"] });
+        },
+        onError: () => {
+          toast.error("Failed to add to favorites");
+        },
+      },
+    );
+  };
+
+  const { data: userFavorites } = useGetUserFavroite();
+
+  const isEventFavorite = userFavorites?.data?.events?.some(
+    (item) => (item._id ?? "").toString() === EventId?.toString(),
+  );
+
   if (isLoading) {
     <LoadingPage />;
   }
@@ -80,15 +119,28 @@ export default function EventDetailPage() {
             </div>
 
             <div className="hidden flex items-center gap-2 md:flex md:items-center md:gap-2">
-              <button className="flex items-center justify-center p-2 border rounded-full hover:bg-primary/10 transition">
-                <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-primary transition-all" />
+              <button
+                onClick={handleAddRemoveFavorite}
+                className="flex items-center justify-center p-2 border rounded-full hover:bg-primary/10 transition">
+                {isPending ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-neutral-400" />
+                ) : (
+                  <Heart
+                    className={cn(
+                      "h-5 w-5 sm:h-6 sm:w-6 text-primary transition-all",
+                      isEventFavorite
+                        ? "text-red-500 scale-110"
+                        : "text-neutral-600 hover:text-neutral-900",
+                    )}
+                    fill={isEventFavorite ? "red" : "none"}
+                  />
+                )}
               </button>
 
               <button
                 onClick={handleShare}
                 className="flex items-center justify-center p-2 border rounded-full hover:bg-primary/10 transition-all active:scale-90"
-                title="Share Event"
-              >
+                title="Share Event">
                 <Share className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </button>
             </div>
@@ -124,26 +176,40 @@ export default function EventDetailPage() {
               className="w-full h-full object-cover"
             />
 
-            {/* Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent z-10 rounded-2xl"></div>
 
-            {/* Favorite/Share Buttons for Mobile */}
-            <div className="absolute inset-0 flex items-start justify-between p-3 md:hidden">
-              <div>
+            <div className="absolute inset-0 z-50 flex items-start justify-between p-3 md:hidden">
+              <Button
+                variant={"ghost"}
+                className="p-0"
+                onClick={() => router.back()}>
                 <ChevronLeft
                   className="h-8 w-8 cursor-pointer rounded-full border  p-1.5 
                  text-primary bg-white transition-all hover:scale-105 active:scale-95"
-                />
-              </div>
+                />{" "}
+              </Button>
               <div className="flex gap-2">
-                <button className="flex items-center justify-center p-2 border bg-white rounded-full transition-all hover:scale-105 active:scale-95">
-                  <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-primary transition-all" />
+                <button
+                  onClick={handleAddRemoveFavorite}
+                  className="flex items-center justify-center p-2 border rounded-full hover:bg-primary/10 transition">
+                  {isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-neutral-400" />
+                  ) : (
+                    <Heart
+                      className={cn(
+                        "h-5 w-5 sm:h-6 sm:w-6 text-primary transition-all",
+                        isEventFavorite
+                          ? "text-red-500 scale-110"
+                          : "text-neutral-600 hover:text-neutral-900",
+                      )}
+                      fill={isEventFavorite ? "red" : "none"}
+                    />
+                  )}
                 </button>
 
                 <button
                   className="flex items-center justify-center p-2 border rounded-full bg-white transition-all hover:scale-105 active:scale-95"
-                  onClick={handleShare}
-                >
+                  onClick={handleShare}>
                   <Share className="h-4 w-4 text-primary" />
                 </button>
               </div>
@@ -237,22 +303,19 @@ export default function EventDetailPage() {
                   width: "100%",
                   borderRadius: "8px",
                   overflow: "hidden",
-                }}
-              >
+                }}>
                 <MapContainer
                   center={[event.data.latitude, event.data.longitude]}
                   zoom={13}
                   scrollWheelZoom={false}
-                  style={{ height: "100%", width: "100%" }}
-                >
+                  style={{ height: "100%", width: "100%" }}>
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
                   <Marker
                     position={[event.data.latitude, event.data.longitude]}
-                    icon={DefaultIcon}
-                  >
+                    icon={DefaultIcon}>
                     <Popup>
                       <div>
                         <h3 className="font-bold text-lg">
@@ -264,16 +327,14 @@ export default function EventDetailPage() {
                         <div className="flex space-x-2 mt-2">
                           <Link
                             href={`/businesses/${event.data.user._id}`}
-                            className="bg-primary !text-base px-3 py-1 rounded text-sm font-medium hover:bg-primary/80"
-                          >
+                            className="bg-primary !text-base px-3 py-1 rounded text-sm font-medium hover:bg-primary/80">
                             View Details
                           </Link>
                           <a
                             href={`https://www.google.com/maps?q=${event.data.latitude},${event.data.longitude}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-secondary !text-base px-3 py-1 rounded text-sm font-medium hover:bg-secondary/80 flex items-center"
-                          >
+                            className="bg-secondary !text-base px-3 py-1 rounded text-sm font-medium hover:bg-secondary/80 flex items-center">
                             Get Directions
                             <ExternalLink className="h-3 w-3 ml-1" />
                           </a>
@@ -333,8 +394,7 @@ export default function EventDetailPage() {
                     </div>
                     <a
                       href={`mailto:${event?.data?.user.email}`}
-                      className="text-gray-700 hover:text-blue-600 transition-colors"
-                    >
+                      className="text-gray-700 hover:text-blue-600 transition-colors">
                       {event?.data?.user.email}
                     </a>
                   </div>

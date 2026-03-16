@@ -60,3 +60,14 @@ export const useVerifyCode = () => {
       }),
   });
 };
+
+export const useDeleteProfile = () => {
+  return useMutation<ApiResponseType<any>, any, any>({
+    mutationKey: ["deleteProfile"],
+    mutationFn: (data: any) =>
+      Post<any, ApiResponseType<any>>({
+        url: "/api/delete-profile",
+        data: data,
+      }),
+  });
+};

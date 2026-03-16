@@ -39,12 +39,18 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import ProfileAvatar from "../Dashboard/ProfilePic";
+import { DeleteConfirmDialog } from "../ui/DynamicDeleteButton";
+import { useQueryClient } from "@tanstack/react-query";
+import { useDeleteProfile } from "@/services/Auth/auth.service";
+import { toast } from "sonner";
 
 const ProfilePage = ({ userData }: { userData: any }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
+  const { mutate: deleteAccount, isPending } = useDeleteProfile();
 
   const form = useForm({
     defaultValues: {
@@ -75,6 +81,22 @@ const ProfilePage = ({ userData }: { userData: any }) => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    deleteAccount(
+      { id: id },
+      {
+        onSuccess: () => {
+          signOut({ callbackUrl: "/" });
+        },
+        onError: (error: any) => {
+          toast.error(
+            error.response?.data?.message || "Failed to delete service",
+          );
+        },
+      },
+    );
   };
 
   return (
@@ -119,169 +141,185 @@ const ProfilePage = ({ userData }: { userData: any }) => {
               </div>
             </div>
           </header>
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Pencil className="w-4 h-4 mr-2" /> Edit Profile
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Edit Profile Information</DialogTitle>
-              </DialogHeader>
+          <div className="flex flex-col">
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Pencil className="w-4 h-4 mr-2" /> Edit Profile
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Edit Profile Information</DialogTitle>
+                </DialogHeader>
 
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-6">
-                  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
-                    <Avatar className="w-16 h-16">
-                      <AvatarImage src={profileImage} />
-                      <AvatarFallback>
-                        <UserIcon />
-                      </AvatarFallback>
-                    </Avatar>
-                    <FormField
-                      control={form.control}
-                      name="image"
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormLabel>Profile Image URL</FormLabel>
-                          <FormControl>
-                            <Input placeholder="https://..." {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    {session?.user?.category === "business" && (
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-6">
+                    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
+                      <Avatar className="w-16 h-16">
+                        <AvatarImage src={profileImage} />
+                        <AvatarFallback>
+                          <UserIcon />
+                        </AvatarFallback>
+                      </Avatar>
                       <FormField
                         control={form.control}
-                        name="abn_number"
+                        name="image"
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel>Profile Image URL</FormLabel>
+                            <FormControl>
+                              <Input placeholder="https://..." {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>ABN Number</FormLabel>
+                            <FormLabel>Name</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
                           </FormItem>
                         )}
                       />
-                    )}
-                  </div>
-
-                  {session?.user?.category === "business" && (
-                    <div className="space-y-6 border-t pt-4">
-                      <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <Building2 className="w-4 h-4" /> Business Details
-                      </h3>
-                      <div className="grid grid-cols-2 gap-4">
+                      {session?.user?.category === "business" && (
                         <FormField
                           control={form.control}
-                          name="business_name"
+                          name="abn_number"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Business Name</FormLabel>
+                              <FormLabel>ABN Number</FormLabel>
                               <FormControl>
                                 <Input {...field} />
                               </FormControl>
                             </FormItem>
                           )}
                         />
-                        <FormField
-                          control={form.control}
-                          name="business_category"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Category</FormLabel>
-                              <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="restaurants">
-                                    Restaurants
-                                  </SelectItem>
-                                  <SelectItem value="cafes">Cafes</SelectItem>
-                                  <SelectItem value="others">Others</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                          <FormLabel>Services</FormLabel>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              append({ name: "", price_category: "hr" })
-                            }>
-                            <Plus className="w-3 h-3 mr-1" /> Add
-                          </Button>
-                        </div>
-                        {fields.map((field, index) => (
-                          <div
-                            key={field.id}
-                            className="p-4 border rounded-md bg-white relative">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="absolute top-1 right-1 h-7 w-7"
-                              onClick={() => remove(index)}>
-                              <Trash2 className="w-4 h-4 text-red-500" />
-                            </Button>
-                            <div className="grid grid-cols-2 gap-2">
-                              <Input
-                                placeholder="Service name"
-                                {...form.register(
-                                  `business_service.${index}.name`,
-                                )}
-                              />
-                              <Input
-                                placeholder="Price category"
-                                {...form.register(
-                                  `business_service.${index}.price_category`,
-                                )}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                      )}
                     </div>
-                  )}
 
-                  <DialogFooter>
-                    <Button type="submit" className="w-full">
-                      Update Records
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
+                    {session?.user?.category === "business" && (
+                      <div className="space-y-6 border-t pt-4">
+                        <h3 className="font-semibold text-lg flex items-center gap-2">
+                          <Building2 className="w-4 h-4" /> Business Details
+                        </h3>
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="business_name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Business Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="business_category"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Category</FormLabel>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="restaurants">
+                                      Restaurants
+                                    </SelectItem>
+                                    <SelectItem value="cafes">Cafes</SelectItem>
+                                    <SelectItem value="others">
+                                      Others
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <FormLabel>Services</FormLabel>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                append({ name: "", price_category: "hr" })
+                              }>
+                              <Plus className="w-3 h-3 mr-1" /> Add
+                            </Button>
+                          </div>
+                          {fields.map((field, index) => (
+                            <div
+                              key={field.id}
+                              className="p-4 border rounded-md bg-white relative">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="absolute top-1 right-1 h-7 w-7"
+                                onClick={() => remove(index)}>
+                                <Trash2 className="w-4 h-4 text-red-500" />
+                              </Button>
+                              <div className="grid grid-cols-2 gap-2">
+                                <Input
+                                  placeholder="Service name"
+                                  {...form.register(
+                                    `business_service.${index}.name`,
+                                  )}
+                                />
+                                <Input
+                                  placeholder="Price category"
+                                  {...form.register(
+                                    `business_service.${index}.price_category`,
+                                  )}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <DialogFooter>
+                      <Button type="submit" className="w-full">
+                        Update Records
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+
+            <DeleteConfirmDialog
+              onConfirm={() => handleDelete(session?.user.id ?? "")}
+              text="This Account"
+              isPending={isPending}
+              header={
+                <div className="flex items-center gap-2 mt-2 text-sm border border-blue-950 px-4 py-2 rounded-full cursor-pointer">
+                  Delete Account
+                  <Trash2 className="w-4 h-4 text-red-500" />
+                </div>
+              }
+            />
+          </div>
         </div>
       </div>
 

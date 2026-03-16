@@ -125,7 +125,6 @@ export default function DashboardNavbar() {
                   </div>
 
                   <div className="my-4 border-t" />
-                  {/* Menu Items */}
                   <div className="space-y-2 text-[15px]">
                     <Link
                       href="/dashboard/profile"
