@@ -20,7 +20,7 @@ export type UserBusinessType = {
   image: string;
   longitude?: number;
   latitude?: number;
-
+  isblocked: boolean;
   business_name?: string;
   business_category?: string;
   abn_number?: string;

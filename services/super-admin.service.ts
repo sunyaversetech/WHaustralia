@@ -1,3 +1,4 @@
+"use client";
 import { useFetcher } from "@/lib/generic.service";
 import { ApiResponseType } from "./apitypes";
 import { UserBusinessType } from "./business.service";
@@ -8,9 +9,9 @@ import { Post } from "@/lib/action";
 
 export const useSuperAdminGetALLBusiness = () => {
   return useFetcher<ApiResponseType<UserBusinessType[]>>(
-    ["getbusinesses"],
+    ["getsuperadminbusinesses"],
     null,
-    `/api/super-admin/businesses`,
+    `/api/super-admin/business`,
   );
 };
 
@@ -51,28 +52,36 @@ export const useDeleteBusinessOrUser = () => {
     mutationKey: ["deleteBusinessOrUser"],
     mutationFn: (data: { id: string }) =>
       Post<{ id: string }, ApiResponseType<any>>({
-        url: `/api/super-admin/businesses/delete/${data.id}`,
+        url: `/api/super-admin/business/delete/${data.id}`,
         data: data,
       }),
   });
 };
 
 export const useVerifyBusiness = () => {
-  return useMutation<ApiResponseType<{ id: string }>, any, { id: string }>({
+  return useMutation<
+    ApiResponseType<{ id: string; verified: boolean }>,
+    any,
+    { id: string; verified: boolean }
+  >({
     mutationKey: ["verifyBusiness"],
-    mutationFn: (data: { id: string }) =>
-      Post<{ id: string }, ApiResponseType<any>>({
-        url: `/api/super-admin/businesses/update-verify/${data.id}`,
+    mutationFn: (data: { id: string; verified: boolean }) =>
+      Post<{ id: string; verified: boolean }, ApiResponseType<any>>({
+        url: `/api/super-admin/business/update-verify/${data.id}`,
         data: data,
       }),
   });
 };
 export const useBlockBusinessOrUser = () => {
-  return useMutation<ApiResponseType<{ id: string }>, any, { id: string }>({
+  return useMutation<
+    ApiResponseType<{ id: string; isblocked: boolean }>,
+    any,
+    { id: string; isblocked: boolean }
+  >({
     mutationKey: ["blockBusiness"],
-    mutationFn: (data: { id: string }) =>
-      Post<{ id: string }, ApiResponseType<any>>({
-        url: `/api/super-admin/businesses/block/${data.id}`,
+    mutationFn: (data: { id: string; isblocked: boolean }) =>
+      Post<{ id: string; isblocked: boolean }, ApiResponseType<any>>({
+        url: `/api/super-admin/business/block/${data.id}`,
         data: data,
       }),
   });

@@ -14,14 +14,14 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { _id, isblocked } = body;
+  const { id, isblocked } = body;
 
   await connectToDb();
-  const user = await User.findOne({ _id: _id });
+  const user = await User.findById(id);
 
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
-  await User.findOneAndUpdate({ _id: _id }, { isblocked: isblocked });
+  await User.findOneAndUpdate({ _id: id }, { isblocked: isblocked });
   return NextResponse.json(user);
 }
