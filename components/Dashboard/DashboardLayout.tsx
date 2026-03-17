@@ -20,14 +20,19 @@ const DashboardLayoutContent = ({
   const pathname = usePathname();
   const router = useRouter();
 
+  console.log(session);
+
   useEffect(() => {
     const isProtectedPath = protectedPathnameFromUser.some((path) =>
       pathname.startsWith(path),
     );
 
-    if (session?.user?.category === "user" && isProtectedPath) {
-      router.push("/unauthorized");
-    }
+    if (session?.user.isblocked) router.push("/blocked");
+
+    if (session?.user)
+      if (session?.user?.category === "user" && isProtectedPath) {
+        router.push("/unauthorized");
+      }
   }, [pathname, session, router]);
 
   return (

@@ -51,9 +51,16 @@ export default function DashboardNavbar() {
         <div className="flex items-center">
           {session ? (
             <div className="flex items-center gap-2">
-              {session.user.emailVerified ? (
+              {session.user.category === "user" &&
+              session.user.emailVerified ? (
                 <Button variant={"outline"} size={"sm"} className="gap-2">
                   <BadgeCheck className="text-blue-300" fill="blue" />
+                  Verified
+                </Button>
+              ) : session.user.category === "business" &&
+                session.user.verified ? (
+                <Button variant={"outline"} size={"sm"} className="gap-2">
+                  <BadgeCheck />
                   Verified
                 </Button>
               ) : (

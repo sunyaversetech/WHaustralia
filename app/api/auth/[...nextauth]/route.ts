@@ -45,6 +45,7 @@ export const authOptions: NextAuthOptions = {
           image: user.image,
           city_name: user.city_name,
           community_name: user.community_name,
+          isblocked: user.isblocked,
         };
       },
     }),
@@ -98,6 +99,7 @@ export const authOptions: NextAuthOptions = {
         token.city_name = (user as any).city_name;
         token.community_name = (user as any).community_name;
         token.emailVerified = (user as any).emailVerified ?? "";
+        token.isblocked = (user as any).isblocked ?? false;
       }
 
       if (trigger === "update" && session) {
@@ -115,6 +117,7 @@ export const authOptions: NextAuthOptions = {
           token.city_name = (dbUser as any).city_name;
           token.community_name = (dbUser as any).community_name;
           token.emailVerified = (dbUser as any).emailVerified ?? "";
+          token.isblocked = (dbUser as any).isblocked ?? false;
         }
       }
       return token;
@@ -129,6 +132,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).city_name = token.city_name;
         (session.user as any).community_name = token.community_name;
         (session.user as any).emailVerified = token.emailVerified;
+        (session.user as any).isblocked = token.isblocked;
       }
       return session;
     },
