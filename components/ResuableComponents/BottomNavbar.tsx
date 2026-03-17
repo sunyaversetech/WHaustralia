@@ -20,9 +20,9 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm">
+    <nav className="md:hidden fixed bottom-0 z-[9999] w-full">
       <div
-        className="flex items-center justify-between p-2  rounded-full
+        className="flex items-center justify-between p-2  
       bg-white/60 backdrop-blur-2xl
       border border-white/40
       shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
@@ -38,7 +38,7 @@ export default function BottomNav() {
               className="flex-1 flex justify-center"
             >
               <div
-                className={`flex items-center justify-center
+                className={`flex flex-col items-center justify-center
               w-full h-12 rounded-full 
               transition-all duration-300
               ${
@@ -52,6 +52,13 @@ export default function BottomNav() {
                   strokeWidth={2}
                   className={active ? "text-white" : ""}
                 />
+                <span
+                  className={`text-[10px] font-medium  ${
+                    active ? "text-white" : "text-primary"
+                  }`}
+                >
+                  {link.name}
+                </span>
               </div>
             </Link>
           );
@@ -63,7 +70,7 @@ export default function BottomNav() {
           className="flex-1 flex justify-center"
         >
           <div
-            className={`flex items-center justify-center
+            className={`flex flex-col items-center justify-center
           w-full h-12 rounded-full
           transition-all duration-300
           ${
@@ -73,6 +80,7 @@ export default function BottomNav() {
           }`}
           >
             <User size={22} strokeWidth={2} />
+            <span className="text-[10px] font-medium">Profile</span>
           </div>
         </Link>
       </div>

@@ -103,7 +103,7 @@ export default function EventHeader() {
   const currentCommunity = searchParams.get("community");
 
   return (
-    <div className="w-full bg-white px-4  py-2 md:px-6 md:py-4 rounded-xl md:rounded-2xl shadow-sm border border-gray-100">
+    <div className=" w-full bg-white px-4 py-2 md:px-6 md:py-4 rounded-xl md:rounded-2xl shadow-sm border border-gray-100">
       <div className="flex items-center justify-between mb-2 gap-2">
         <h1 className="text-lg md:text-xl font-bold text-slate-800">
           Trending Events

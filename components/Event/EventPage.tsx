@@ -47,10 +47,10 @@ export default function EventsPageClient() {
 
   return (
     <div className="min-h-screen bg-neutral-50 pb-20">
-      <div className="container-modern py-8">
+      <div className="container-modern py-4 md:py-8 mx-4 md:mx-6 w-auto">
         <EventHeader />
         {isLoading ? (
-          <div className="flex  items-center gap-2   mt-5">
+          <div className="flex items-center gap-2  mt-5">
             <Skeleton className="h-72 w-96 mb-4 animate-pulse rounded-xl" />
             <Skeleton className="h-72 w-96 mb-4 animate-pulse" />
             <Skeleton className="h-72 w-96 mb-4 animate-pulse" />

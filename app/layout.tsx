@@ -37,7 +37,7 @@ export default function RootLayout({
             <SessionWrapper>
               <NavbarProvider />
               <TooltipProvider>
-                <div>{children}</div>
+                <div className="bg-neutral-50">{children}</div>
               </TooltipProvider>
               <Toaster />
               <BottomNav />
