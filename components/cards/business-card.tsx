@@ -74,7 +74,7 @@ export default function BusinessCard({ business }: { business: any }) {
   return (
     <div
       className=" overflow-hidden group cursor-pointer"
-      onClick={() => router.push(`/businesses/${slug}`)}
+      // onClick={() => router.push(`/businesses/${slug}`)}
     >
       <div className="relative w-full h-56 md:h-60 rounded-xl overflow-hidden group">
         <Image
