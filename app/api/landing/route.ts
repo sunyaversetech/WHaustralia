@@ -2,6 +2,7 @@ import { connectToDb } from "@/lib/db";
 import User from "@/server/models/Auth.model";
 import { Deal } from "@/server/models/DealSchema.model";
 import Event from "@/server/models/Event.model";
+import { Review } from "@/server/models/Review.model";
 import { NextRequest, NextResponse } from "next/server";
 
 function escapeRegex(text: string) {
@@ -26,8 +27,28 @@ export async function GET(request: NextRequest) {
       query.name = { $regex: safeCity, $options: "i" };
     }
 
-    const business = await User.find({ category: "business", ...query }).sort({
-      createdAt: -1,
+    const business = await User.find({ category: "business", ...query })
+      .sort({
+        createdAt: -1,
+      })
+      .lean();
+
+    const businessIds = business.map((b) => b._id);
+    const reviews = await Review.find({
+      business_id: { $in: businessIds },
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const businessesWithReviews = business.map((business) => {
+      const businessIdStr = business._id?.toString();
+      return {
+        ...business,
+        reviews: reviews.filter((review) => {
+          const reviewBusinessIdStr = review.business_id?.toString();
+          return reviewBusinessIdStr === businessIdStr;
+        }),
+      };
     });
     const upcomingevents = await Event.find({
       "dateRange.from": { $gte: todayISO },
@@ -44,7 +65,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
-        data: { upcomingevents, deals, business },
+        data: { upcomingevents, deals, business: businessesWithReviews },
         message: "Businesses retrieved successfully",
       },
       { status: 200 },
