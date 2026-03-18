@@ -89,11 +89,7 @@ export default function BusinessCard({ business }: { business: any }) {
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded-full bg-white text-primary">
               <Building className="w-3 h-3" />
-              <span>Business</span>
-            </div>
-            <div className="flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded-full bg-white text-primary">
-              <Building className="w-3 h-3" />
-              <span>{business.business_category}</span>
+              <p className="capitalize">{business.business_category}</p>
             </div>
           </div>
         </div>
@@ -106,7 +102,7 @@ export default function BusinessCard({ business }: { business: any }) {
               {business.business_name}
             </h3>
 
-            <p className="text-xs md:text-sm text-muted-foreground line-clamp-1">
+            <p className="text-xs md:text-sm text-muted-foreground line-clamp-1 capitalize">
               {business.city ?? ""}
             </p>
           </div>

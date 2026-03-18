@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import {
@@ -13,16 +14,13 @@ import { MapPin, ChevronDown } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useCallback } from "react";
 
 export default function Navbar() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentCity = searchParams.get("city");
-
-  const isActive = (path: string) => pathname === path;
 
   const updateQuery = useCallback(
     (updates: Record<string, string | null>) => {
@@ -31,15 +29,31 @@ export default function Navbar() {
       Object.entries(updates).forEach(([key, value]) => {
         if (value && value !== "all") {
           params.set(key, value);
+          if (key === "city") localStorage.setItem("preferredCity", value); // Save
         } else {
           params.delete(key);
+          if (key === "city") localStorage.removeItem("preferredCity"); // Clear if 'Australia'
         }
       });
 
-      router.push(`?${params.toString()}`, { scroll: false });
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
     },
-    [router, searchParams],
+    [router, searchParams, pathname],
   );
+
+  // 2. Initialize from localStorage on load
+  useEffect(() => {
+    const savedCity = localStorage.getItem("preferredCity");
+    // Only push if there's a saved city AND no city is currently in the URL
+    if (savedCity && !currentCity) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("city", savedCity);
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    }
+  }, [currentCity, pathname, router, searchParams]);
+
+  const isActive = (path: string) =>
+    pathname.startsWith(path) || pathname === path;
 
   const buildPath = (href: string) => {
     if (!currentCity) return href;
@@ -47,11 +61,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav
-      className="sticky top-0 z-[9999] flex items-center justify-between px-6 py-3
-    bg-white/10 backdrop-blur-xl border-b border-white/20 shadow-lg"
-    >
-      {/* Logo */}
+    <nav className="sticky top-0 z-[9999] flex items-center justify-between px-6 py-3 bg-white/10 backdrop-blur-xl border-b border-white/20 shadow-lg">
       <Link href={buildPath("/")} className="flex items-center">
         <Image
           src="/wha/logo.png"
@@ -63,13 +73,8 @@ export default function Navbar() {
         />
       </Link>
 
-      {/* Center Nav */}
       {!pathname.startsWith("/dashboard") && (
-        <div
-          className="hidden md:flex items-center
-        bg-white/20 backdrop-blur-lg border border-priamry
-        rounded-full p-1 gap-1 text-sm font-medium shadow-md"
-        >
+        <div className="hidden md:flex items-center bg-white/20 backdrop-blur-lg border border-primary rounded-full p-1 gap-1 text-sm font-medium shadow-md">
           {[
             { name: "Events", href: "/events" },
             { name: "Businesses", href: "/businesses" },
@@ -77,43 +82,21 @@ export default function Navbar() {
             <Link
               key={item.href}
               href={buildPath(item.href)}
-              className={`px-5 py-2 rounded-full
-              ${
+              className={`px-5 py-2 rounded-full transition-colors ${
                 isActive(item.href)
                   ? "bg-primary text-white shadow"
                   : "text-primary hover:bg-white/20"
-              }`}
-            >
+              }`}>
               {item.name}
             </Link>
           ))}
-
-          {/* {status === "authenticated" && (
-            <Link
-              href={buildPath("/dashboard")}
-              className={`px-5 py-2 rounded-full transition-all duration-300
-              ${
-                isActive("/dashboard")
-                  ? "bg-primary text-white shadow"
-                  : "text-primary hover:bg-white/20"
-              }`}
-            >
-              Dashboard
-            </Link>
-          )} */}
         </div>
       )}
 
-      {/* Right Section */}
       <div className="flex items-center gap-3">
-        {/* City Filter - Redesigned */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button
-              className="flex items-center gap-2 px-4 py-2 rounded-full
-            bg-white/20 backdrop-blur-md border border-primary
-            text-primary text-sm hover:bg-white/30 transition focus:outline-none focus:ring-0 focus-visible:ring-0"
-            >
+            <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-primary text-primary text-sm hover:bg-white/30 transition focus:outline-none">
               <MapPin className="h-4 w-4" />
               <span className="capitalize">{currentCity ?? "Australia"}</span>
               <ChevronDown className="h-4 w-4 opacity-70" />
@@ -127,15 +110,13 @@ export default function Navbar() {
                 onSelect={() =>
                   updateQuery({ city: city === "Australia" ? null : city })
                 }
-                className="capitalize cursor-pointer"
-              >
+                className="capitalize cursor-pointer">
                 {city}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Auth Section */}
         {session ? (
           <DropdownMenu>
             <DropdownMenuTrigger>
@@ -149,46 +130,31 @@ export default function Navbar() {
 
             <DropdownMenuContent
               align="end"
-              className="w-64 p-3 rounded-2xl bg-white/90 backdrop-blur-lg shadow-xl"
-            >
+              className="w-64 p-3 rounded-2xl bg-white/90 backdrop-blur-lg shadow-xl">
               <p className="font-semibold">{session.user?.name}</p>
               <p className="text-sm text-muted-foreground mb-2">
                 {session.user?.email}
               </p>
-
               <div className="border-t my-2" />
-
               <Link
-                href="/dashboard"
-                className="block px-2 py-2 rounded-md hover:bg-gray-100"
-              >
+                href={buildPath("/dashboard")}
+                className="block px-2 py-2 rounded-md hover:bg-gray-100">
                 Dashboard
               </Link>
-
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="w-full text-left px-2 py-2 rounded-md hover:bg-gray-100"
-              >
+                className="w-full text-left px-2 py-2 rounded-md hover:bg-gray-100">
                 Logout
               </button>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
           <div className="hidden md:flex gap-2">
-            <Link href="/auth">
-              <Button className="rounded-full px-5 bg-white/20 backdrop-blur-md text-priamry hover:bg-primary hover:text-white">
+            <Link href={buildPath("/auth")}>
+              <Button className="rounded-full px-5 bg-white/20 backdrop-blur-md text-primary hover:bg-primary hover:text-white">
                 Login
               </Button>
             </Link>
-
-            {/* <Link href="/auth">
-              <Button
-                variant="outline"
-                className="rounded-full px-5 border-white/40 text-white hover:bg-white/20"
-              >
-                Sign up
-              </Button>
-            </Link> */}
           </div>
         )}
       </div>
