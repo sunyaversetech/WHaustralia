@@ -45,31 +45,24 @@ const UserSidebar = () => {
           hasDropdown: false,
           active: pathname === "/dashboard",
         },
-        {
-          name: "events",
-          icon: Ticket,
-          link: buildPath("/dashboard/events"),
-          hasDropdown: false,
-          active: pathname.startsWith("/dashboard/events"),
-        },
       ],
     },
     {
       groupLabel: "Profile",
       items: [
         {
-          name: "profile",
-          icon: User,
-          link: buildPath("/dashboard/profile"),
-          hasDropdown: false,
-          active: pathname.startsWith("/dashboard/profile"),
-        },
-        {
           name: "Favorites",
           icon: HeartPlus,
           link: buildPath("/dashboard/favorite"),
           hasDropdown: false,
           active: pathname.startsWith("/dashboard/favorite"),
+        },
+        {
+          name: "profile",
+          icon: User,
+          link: buildPath("/dashboard/profile"),
+          hasDropdown: false,
+          active: pathname.startsWith("/dashboard/profile"),
         },
       ],
     },

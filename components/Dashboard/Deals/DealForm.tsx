@@ -29,6 +29,9 @@ import { useCreateDeals } from "@/services/deal.service";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
+const toggleItemStyles =
+  "border! rounded-lg! px-7! py-2! data-[state=on]:bg-primary! min-w-fit data-[state=on]:text-primary-foreground! w-full  flex-1";
+
 export const dealSchema = z.object({
   _id: z.string().optional(),
   title: z.string().min(2, "Title is too short"),
@@ -38,6 +41,7 @@ export const dealSchema = z.object({
   terms_for_the_deal: z.string().min(1, "Terms are required"),
   deal_code: z.string().toUpperCase().min(3, "Code must be 3+ characters"),
   max_redemptions: z.number().min(1, "Max redemptions is required"),
+  city: z.string().min(1, "City is required"),
 });
 
 export type DealFormValues = z.infer<typeof dealSchema>;
@@ -124,8 +128,7 @@ export default function DealForm() {
                           className={cn(
                             "pl-3 text-left font-normal",
                             !field.value && "text-muted-foreground",
-                          )}
-                        >
+                          )}>
                           {field.value ? (
                             format(field.value, "PPP")
                           ) : (
@@ -166,8 +169,7 @@ export default function DealForm() {
                       if (value) field.onChange(value);
                     }}
                     value={field.value}
-                    className="flex flex-wrap justify-start gap-2"
-                  >
+                    className="flex flex-wrap justify-start gap-2">
                     <ToggleGroupItem
                       value={"all"}
                       className={cn(
@@ -176,8 +178,7 @@ export default function DealForm() {
                         "hover:bg-accent hover:text-accent-foreground",
                         "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary data-[state=on]:opacity-100",
                         "first:rounded-md last:rounded-md",
-                      )}
-                    >
+                      )}>
                       All
                     </ToggleGroupItem>
                     <ToggleGroupItem
@@ -188,13 +189,49 @@ export default function DealForm() {
                         "hover:bg-accent hover:text-accent-foreground",
                         "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary data-[state=on]:opacity-100",
                         "first:rounded-md last:rounded-md",
-                      )}
-                    >
+                      )}>
                       To WHA Users
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </FormControl>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="city"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>City</FormLabel>
+                <FormControl>
+                  <ToggleGroup
+                    type="single"
+                    value={field.value}
+                    onValueChange={(val) => val && field.onChange(val)}
+                    className="flex flex-wrap gap-4">
+                    {[
+                      "Sydney",
+                      "Canberra",
+                      // "Melbourne",
+                      // "Brisbane",
+                      // "Adelaide",
+                      // "Gold Coast",
+                      // "Perth",
+                      // "Hobart",
+                      // "Darwin",
+                      "others",
+                    ].map((cat) => (
+                      <ToggleGroupItem
+                        key={cat}
+                        value={cat}
+                        className={toggleItemStyles}>
+                        {cat}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                </FormControl>
               </FormItem>
             )}
           />
@@ -256,8 +293,7 @@ export default function DealForm() {
           <Button
             type="submit"
             className="w-full"
-            disabled={form.formState.isSubmitting}
-          >
+            disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? "Submitting..." : "Create Deal"}
           </Button>
         </form>

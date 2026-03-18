@@ -67,6 +67,16 @@ export const useGetSingleDeal = (id: string) => {
   );
 };
 
+export const useVerifySingleDeal = () => {
+  return useMutation<ApiResponseType<any>, any, any>({
+    mutationKey: ["verify-deal"],
+    mutationFn: (data: any) =>
+      Post<any, ApiResponseType<any>>({
+        url: `/api/deals/verify`,
+        data: data,
+      }),
+  });
+};
 export const useDeleteDeal = () => {
   return useMutation<ApiResponseType<{ id: string }>, any, { id: string }>({
     mutationKey: ["deleteDeal"],

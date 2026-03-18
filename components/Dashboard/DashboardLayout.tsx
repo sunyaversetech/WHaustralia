@@ -9,6 +9,7 @@ const protectedPathnameFromUser = [
   "/dashboard/deals",
   "/dashboard/inventory",
   "/dashboard/settings",
+  "/dashboard/complete-profile",
 ];
 
 const DashboardLayoutContent = ({

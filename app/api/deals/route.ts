@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
       terms_for_the_deal,
       deal_code,
       max_redemptions,
+      city,
     } = await req.json();
 
     const validTill = valid_till;
@@ -32,7 +33,8 @@ export async function POST(req: NextRequest) {
       !dealsFor ||
       !description ||
       !termsForTheDeal ||
-      !dealCode
+      !dealCode ||
+      !city
     ) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -49,6 +51,7 @@ export async function POST(req: NextRequest) {
       terms_for_the_deal: termsForTheDeal,
       deal_code: dealCode,
       max_redemptions,
+      city,
     });
 
     return NextResponse.json(newDeal, { status: 201 });
