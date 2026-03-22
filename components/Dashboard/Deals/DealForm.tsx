@@ -36,10 +36,8 @@ export const dealSchema = z.object({
   _id: z.string().optional(),
   title: z.string().min(2, "Title is too short"),
   valid_till: z.date().min(1, "Date must be in the future"),
-  deals_for: z.string().min(1, "Target audience is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   terms_for_the_deal: z.string().min(1, "Terms are required"),
-  deal_code: z.string().toUpperCase().min(3, "Code must be 3+ characters"),
   max_redemptions: z.number().min(1, "Max redemptions is required"),
   city: z.string().min(1, "City is required"),
 });
@@ -51,10 +49,8 @@ export default function DealForm() {
     resolver: zodResolver(dealSchema),
     defaultValues: {
       title: "",
-      deals_for: "",
       description: "",
       terms_for_the_deal: "",
-      deal_code: "",
     },
   });
 
@@ -102,20 +98,6 @@ export default function DealForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
-              name="deal_code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Promo Code</FormLabel>
-                  <FormControl>
-                    <Input placeholder="SAVE50" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="valid_till"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
@@ -154,50 +136,6 @@ export default function DealForm() {
               )}
             />
           </div>
-
-          <FormField
-            control={form.control}
-            name="deals_for"
-            render={({ field }) => (
-              <FormItem className="space-y-3">
-                <FormLabel>Target Audience</FormLabel>
-                <FormControl>
-                  <ToggleGroup
-                    type="single"
-                    variant="outline"
-                    onValueChange={(value) => {
-                      if (value) field.onChange(value);
-                    }}
-                    value={field.value}
-                    className="flex flex-wrap justify-start gap-2">
-                    <ToggleGroupItem
-                      value={"all"}
-                      className={cn(
-                        "!rounded-md !border border-input h-10 px-4",
-                        "min-w-[100px] transition-all",
-                        "hover:bg-accent hover:text-accent-foreground",
-                        "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary data-[state=on]:opacity-100",
-                        "first:rounded-md last:rounded-md",
-                      )}>
-                      All
-                    </ToggleGroupItem>
-                    <ToggleGroupItem
-                      value={"to_wha_user"}
-                      className={cn(
-                        "!rounded-md !border border-input h-10 px-4",
-                        "min-w-[100px] transition-all",
-                        "hover:bg-accent hover:text-accent-foreground",
-                        "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary data-[state=on]:opacity-100",
-                        "first:rounded-md last:rounded-md",
-                      )}>
-                      To WHA Users
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           <FormField
             control={form.control}
