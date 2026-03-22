@@ -37,6 +37,7 @@ export default function DealDetailPage({ params }: { params: { id: string } }) {
     success: boolean;
     message: string;
     code?: string;
+    status: string;
   } | null>(null);
   const { mutate, isPending } = useRedeemCode();
   const { data } = useGetRedeem();
@@ -56,6 +57,7 @@ export default function DealDetailPage({ params }: { params: { id: string } }) {
           success: true,
           message: "success",
           code: userRedemption?.uniqueKey,
+          status: userRedemption.status,
         }),
       0,
     );
@@ -79,6 +81,7 @@ export default function DealDetailPage({ params }: { params: { id: string } }) {
             success: true,
             message: "success",
             code: data.uniqueKey,
+            status: "pending",
           });
           queryClient.invalidateQueries({ queryKey: ["redeem"] });
         },
@@ -86,6 +89,7 @@ export default function DealDetailPage({ params }: { params: { id: string } }) {
           setRedemptionResult({
             success: false,
             message: error.message,
+            status: "error",
           });
           toast.error(error.message);
         },
@@ -197,7 +201,7 @@ export default function DealDetailPage({ params }: { params: { id: string } }) {
 
               <div className="border-t-2 border-dashed border-gray-200 my-6"></div>
               <div className="text-center">
-                {redemptionResult?.success ? (
+                {redemptionResult?.status === "verified" ? (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-6 flex flex-col items-center">
                     <div className="flex items-center justify-center space-x-2 mb-4">
                       <Check className="h-5 w-5 text-green-600" />
@@ -206,22 +210,46 @@ export default function DealDetailPage({ params }: { params: { id: string } }) {
                       </span>
                     </div>
 
-                    <div className="bg-white p-3 rounded-lg shadow-sm mb-4 border border-green-200">
+                    {/* <div className="bg-white p-3 rounded-lg shadow-sm mb-4 border border-green-200">
+                      <QRCodeCanvas
+                        value={redemptionResult.code || ""}
+                        size={150}
+                      />
+                    </div> */}
+
+                    <p className="text-green-700 text-sm mb-2">
+                      You have successfully redeemed this deal Already
+                    </p>
+                    {/* <div className="bg-white border border-green-300 rounded-lg p-4 mb-3 w-full max-w-xs">
+                      <code className="text-xl font-mono text-blue-950 font-bold text-green-800 tracking-widest">
+                        {redemptionResult.code}
+                      </code>
+                    </div> */}
+                  </div>
+                ) : redemptionResult?.success ? (
+                  <div className=" border rounded-lg p-6 flex flex-col items-center">
+                    <div className="flex items-center justify-center space-x-2 mb-4">
+                      <span className=" font-medium text-lg">
+                        Show this QR Code to the business
+                      </span>
+                    </div>
+
+                    <div className="bg-white p-3 rounded-lg shadow-sm mb-4 border ">
                       <QRCodeCanvas
                         value={redemptionResult.code || ""}
                         size={150}
                       />
                     </div>
 
-                    <p className="text-green-700 text-sm mb-2">
+                    <p className=" text-sm mb-2">
                       Show this code to the business:
                     </p>
-                    <div className="bg-white border border-green-300 rounded-lg p-4 mb-3 w-full max-w-xs">
-                      <code className="text-xl font-mono text-blue-950 font-bold text-green-800 tracking-widest">
+                    <div className="bg-white border  rounded-lg p-4 mb-3 w-full max-w-xs">
+                      <code className="text-xl font-mono  font-bold tracking-widest">
                         {redemptionResult.code}
                       </code>
                     </div>
-                    <p className="text-green-700 text-xs">
+                    <p className="text-red-500 text-xs">
                       Code expires when deal expires
                     </p>
                   </div>
