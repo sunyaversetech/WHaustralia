@@ -103,12 +103,12 @@ export default function DealsHeader() {
           Hot Deals
         </h1>
 
-        <Tabs value={currentTab} onValueChange={handleTabChange}>
+        {/* <Tabs value={currentTab} onValueChange={handleTabChange}>
           <TabsList>
             <TabsTrigger value="list">List</TabsTrigger>
             <TabsTrigger value="map">Map</TabsTrigger>
           </TabsList>
-        </Tabs>
+        </Tabs> */}
       </div>
 
       {/* Search */}

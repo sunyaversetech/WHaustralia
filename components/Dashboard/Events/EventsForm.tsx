@@ -61,7 +61,7 @@ export const eventSchema = z.object({
   category_name: z.string().optional(),
   price_category: z.enum(["free", "paid"]),
   ticket_link: z.string().optional(),
-  ticket_price: z.string().optional(),
+  ticket_price: z.union([z.string(), z.literal("")]).optional(),
   community: z.string().min(1, "Community is required"),
   community_name: z.string().optional(),
   city: z.string().min(2, "City is required"),
@@ -117,10 +117,10 @@ export function EventForm() {
       form.setValue("startTime", data.startTime);
       form.setValue("endTime", data.endTime);
       if (data?.dateRange?.from) {
-        form.setValue("dateRange.from", data.dateRange.from);
+        form.setValue("dateRange.from", new Date(data.dateRange.from));
       }
       if (data?.dateRange?.to) {
-        form.setValue("dateRange.to", data.dateRange.to);
+        form.setValue("dateRange.to", new Date(data.dateRange.to));
       }
       form.setValue("community", data.community);
       form.setValue("city", data.city);
@@ -132,7 +132,7 @@ export function EventForm() {
       form.setValue("category_name", data.category_name);
       form.setValue("price_category", data.price_category);
       form.setValue("ticket_link", data.ticket_link ?? "");
-      form.setValue("ticket_price", data.ticket_price ?? "");
+      if (data.ticket_price) form.setValue("ticket_price", data.ticket_price);
       form.setValue("email", data.email);
       form.setValue("phone_number", Number(data.phone_number));
       form.setValue("website_link", data.website_link);
@@ -166,6 +166,9 @@ export function EventForm() {
       },
     });
   };
+
+  console.log("form errors", form.formState.errors);
+  console.log("form data", form.getValues());
 
   return (
     <Form {...form}>
