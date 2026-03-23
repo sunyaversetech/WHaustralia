@@ -1,42 +1,22 @@
 "use client";
 import Link from "next/link";
-import {
-  Calendar,
-  Sparkles,
-  Building,
-  Tag,
-  Users,
-  CalendarRange,
-  Star,
-} from "lucide-react";
+import { Calendar, Sparkles, Building, Tag, Users, Star } from "lucide-react";
 import EventCard from "@/components/cards/event-card";
-import DealCard from "@/components/cards/deal-card";
 import BusinessCard from "@/components/cards/business-card";
 import PlaceholderCard from "@/components/cards/placeholder-card";
-import { getDeals } from "@/lib/data/deals";
-import { getBusinesses } from "@/lib/data/businesses";
 import CardSlider from "@/components/ui/card-slider";
 import FeaturedCard from "@/components/cards/featured-card";
-import { featuredItems } from "@/lib/data/featured";
-import {
-  useFilteredDeals,
-  useFilteredBusinesses,
-} from "@/hooks/use-filtered-data";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "../ui/carousel";
+import { useFilteredBusinesses } from "@/hooks/use-filtered-data";
+
 import { useGetLandingPageData } from "@/services/landing.service";
-import SponsorSlider from "../ui/sponsor-slider";
+import Loading from "@/app/businesses/loading";
 
 export default function LandingPage() {
-  const { data } = useGetLandingPageData();
+  const { data, isLoading } = useGetLandingPageData();
 
   const businesses = useFilteredBusinesses(data?.data.business);
 
+  if (isLoading) return <Loading />;
   return (
     <div className="container-modern">
       <div className=" px-4 pt-2 md:pt-6">
