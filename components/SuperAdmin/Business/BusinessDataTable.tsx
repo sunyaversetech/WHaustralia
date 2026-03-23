@@ -81,7 +81,6 @@ const BusinessTable = ({ data }: { data: UserBusinessType[] }) => {
     );
   };
   const handleisSponsor = (id: string, currentStatus: boolean) => {
-    console.log(id, currentStatus);
     isSponsor(
       { id, sponser: !currentStatus },
       {

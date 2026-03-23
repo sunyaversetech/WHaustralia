@@ -52,7 +52,6 @@ export async function GET(request: NextRequest) {
       b.business_name?.toLowerCase().replace(/[^a-z0-9]/g, ""),
     );
 
-    console.log(businessIds);
     const reviews = await Review.find({
       business_id: { $in: businessIds },
     })

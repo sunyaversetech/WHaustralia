@@ -167,9 +167,6 @@ export function EventForm() {
     });
   };
 
-  console.log("form errors", form.formState.errors);
-  console.log("form data", form.getValues());
-
   return (
     <Form {...form}>
       <div className="space-y-6 max-w-6xl mx-auto">

@@ -37,10 +37,11 @@ import { useQueryClient } from "@tanstack/react-query";
 export default function EventDetailPage() {
   const param = useParams();
   const awaitedParams = param as { id: string };
+  const slug = awaitedParams?.id.toLowerCase().replace(/[^a-z0-9]/g, "");
   const { data: session } = useSession();
   const { mutate, isPending } = useCreateFavroite();
   const router = useRouter();
-  const { data: event, isLoading } = useGetSingleEvent(awaitedParams.id);
+  const { data: event, isLoading } = useGetSingleEvent(slug);
   const queryClient = useQueryClient();
   const DefaultIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -228,8 +229,6 @@ export default function EventDetailPage() {
           </div>
         </div>
       </div>
-
-      {/* event details  */}
 
       <div className=" py-4 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">

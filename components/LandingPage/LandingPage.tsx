@@ -36,7 +36,6 @@ export default function LandingPage() {
   const { data } = useGetLandingPageData();
 
   const businesses = useFilteredBusinesses(data?.data.business);
-  console.log("businesses", data);
 
   return (
     <div className="container-modern">

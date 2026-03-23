@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 export default function DealsPage() {
   const { data, isLoading } = useGetDeals();
   const router = useRouter();
-  console.log(data);
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex items-start justify-between md:hidden">

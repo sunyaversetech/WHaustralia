@@ -10,7 +10,8 @@ export async function GET(request: NextRequest, { params }: Props) {
 
     const { id } = await params;
 
-    const event = await Event.findById(id).populate(
+    const searchRegex = id.split("").join("\\s*");
+    const event = await Event.findOne({ title: searchRegex }).populate(
       "user",
       "email business_name",
     );
