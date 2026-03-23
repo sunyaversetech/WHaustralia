@@ -33,23 +33,39 @@ export async function GET(request: NextRequest) {
       })
       .lean();
 
-    const businessIds = business.map((b) => b._id);
+    const businessIds = business.map((b) =>
+      b.business_name?.toLowerCase().replace(/[^a-z0-9]/g, ""),
+    );
+
     const reviews = await Review.find({
       business_id: { $in: businessIds },
     })
       .sort({ createdAt: -1 })
       .lean();
 
-    const businessesWithReviews = business.map((business) => {
-      const businessIdStr = business._id?.toString();
+    const businessesWithReviews = business.map((business: any) => {
+      const currentBusinessSlug = business.business_name
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
       return {
         ...business,
         reviews: reviews.filter((review) => {
-          const reviewBusinessIdStr = review.business_id?.toString();
-          return reviewBusinessIdStr === businessIdStr;
+          // const reviewBusinessIdStr = review.business_id?.toString();
+
+          return review.business_id === currentBusinessSlug;
         }),
       };
     });
+    // const businessesWithReviews = business.map((business) => {
+    //   const businessIdStr = business._id?.toString();
+    //   return {
+    //     ...business,
+    //     reviews: reviews.filter((review) => {
+    //       const reviewBusinessIdStr = review.business_id?.toString();
+    //       return reviewBusinessIdStr === businessIdStr;
+    //     }),
+    //   };
+    // });
     const upcomingevents = await Event.find({
       "dateRange.from": { $gte: todayISO },
     })
