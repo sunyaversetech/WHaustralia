@@ -23,7 +23,11 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { useCreateEvent, useGetSingleEvent } from "@/services/event.service";
+import {
+  useCreateEvent,
+  useGetSingleEvent,
+  useGetSingleForForm,
+} from "@/services/event.service";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import MapPicker from "./LeafLetIntegration";
@@ -79,7 +83,7 @@ export function EventForm() {
   const router = useRouter();
   const params = useSearchParams();
   const id = params.get("id");
-  const { data: singleEventData } = useGetSingleEvent(id as string);
+  const { data: singleEventData } = useGetSingleForForm(id as string);
 
   const data = singleEventData?.data;
 
@@ -166,6 +170,8 @@ export function EventForm() {
       },
     });
   };
+
+  console.log("form errors", form.formState.errors);
 
   return (
     <Form {...form}>

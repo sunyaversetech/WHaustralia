@@ -19,7 +19,10 @@ export async function GET() {
     if (session.user.category === "user") {
       const deals = await Redemption.find({
         user: (session.user as any).id,
-      }).lean();
+        status: "pending",
+      })
+        .populate("deal")
+        .lean();
       const favorite = await Favorite.find({
         user_id: (session.user as any).id,
       })

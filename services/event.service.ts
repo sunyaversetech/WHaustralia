@@ -90,6 +90,13 @@ export const useGetSingleEvent = (id: string) => {
     `/api/event/single-event/${id}`,
   );
 };
+export const useGetSingleForForm = (id: string) => {
+  return useFetcher<ApiResponseType<EventType>>(
+    ["singleEventForm", id],
+    null,
+    `/api/event/single-event-for-form/${id}`,
+  );
+};
 
 export const useDeleteEvent = () => {
   return useMutation<ApiResponseType<{ id: string }>, any, { id: string }>({

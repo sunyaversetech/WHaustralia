@@ -86,30 +86,43 @@ export default function Dashboard() {
                 </h2>
 
                 <div>
-                  {data?.data?.favorite?.map((item: any) => (
-                    <div
-                      className="flex items-center justify-between p-6 border-b cursor-pointer hover:bg-gray-50 transition"
-                      key={item._id}>
+                  {data?.data?.favorite && data?.data?.favorite.length > 0 ? (
+                    data?.data?.favorite?.map((item: any) => (
+                      <div
+                        className="flex items-center justify-between p-6 border-b cursor-pointer hover:bg-gray-50 transition"
+                        key={item._id}>
+                        <div>
+                          <p className="font-medium text-gray-800">
+                            {item.item_id.title}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {formatDate(
+                              item.item_id.dateRange.from,
+                              "yyyy-MM-dd",
+                            )}{" "}
+                            to{" "}
+                            {formatDate(
+                              item.item_id.dateRange.to,
+                              "yyyy-MM-dd",
+                            )}
+                          </p>
+                        </div>
+                        <Link
+                          href={"/dashboard/favorite"}
+                          className="text-sm text-blue-600 font-medium">
+                          View
+                        </Link>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex items-center justify-between p-6 border-b cursor-pointer hover:bg-gray-50 transition">
                       <div>
                         <p className="font-medium text-gray-800">
-                          {item.item_id.title}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {formatDate(
-                            item.item_id.dateRange.from,
-                            "yyyy-MM-dd",
-                          )}{" "}
-                          to{" "}
-                          {formatDate(item.item_id.dateRange.to, "yyyy-MM-dd")}
+                          No Added Favorites
                         </p>
                       </div>
-                      <Link
-                        href={"/dashboard/favorite"}
-                        className="text-sm text-blue-600 font-medium">
-                        View
-                      </Link>
                     </div>
-                  ))}
+                  )}
 
                   {/* <div className="flex items-center justify-between p-6 border-b cursor-pointer hover:bg-gray-50 transition">
                     <div>
@@ -132,29 +145,28 @@ export default function Dashboard() {
                 </h2>
 
                 <div>
-                  <div className="flex items-center justify-between p-6 border-b cursor-pointer hover:bg-gray-50 transition">
-                    <div>
-                      <p className="font-medium text-gray-800">Acme Corp</p>
-                      <p className="text-sm text-gray-500">
-                        $12,000 • Closed Won
-                      </p>
+                  {data?.data?.deals && data?.data?.deals?.length > 0 ? (
+                    data?.data?.deals?.map((item: any) => (
+                      <div
+                        className="flex items-center justify-between p-6 border-b cursor-pointer hover:bg-gray-50 transition"
+                        key={item._id}>
+                        <div>
+                          <p className="font-medium text-gray-800">
+                            {item.deal.title}
+                          </p>
+                        </div>
+                        <span className="text-sm text-green-600 font-medium">
+                          View
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex items-center justify-between p-6 border-b cursor-pointer hover:bg-gray-50 transition">
+                      <div>
+                        <p className="font-medium text-gray-800">No Deals</p>
+                      </div>
                     </div>
-                    <span className="text-sm text-green-600 font-medium">
-                      View
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between p-6 border-b cursor-pointer hover:bg-gray-50 transition">
-                    <div>
-                      <p className="font-medium text-gray-800">BrightTech</p>
-                      <p className="text-sm text-gray-500">
-                        $8,500 • Negotiation
-                      </p>
-                    </div>
-                    <span className="text-sm text-green-600 font-medium">
-                      View
-                    </span>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>

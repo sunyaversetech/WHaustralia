@@ -78,7 +78,6 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     const validatedData = eventSchema.partial().parse(rawData);
 
     const event = await Event.findById(eventId);
-    await deleteFromS3(event.image);
     if (!event) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
@@ -95,16 +94,20 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
     if (imageField instanceof File && imageField.size > 0) {
       if (event.image) {
-        await deleteFromS3(event.image);
+        try {
+          await deleteFromS3(event.image);
+        } catch (e) {
+          console.error("Failed to delete old image, continuing...", e);
+        }
       }
       const buffer = Buffer.from(await imageField.arrayBuffer());
-      finalImageUrl = await uploadToS3(
+      const s3Response = await uploadToS3(
         buffer,
         imageField.name,
         imageField.type,
       );
-    } else if (typeof imageField === "string" && imageField.trim() !== "") {
-      finalImageUrl = imageField;
+
+      finalImageUrl = s3Response.Location;
     }
 
     const updatedEvent = await Event.findByIdAndUpdate(
