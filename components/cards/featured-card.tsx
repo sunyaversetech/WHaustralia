@@ -51,7 +51,11 @@ const FeaturedCard = memo(function FeaturedCard({ item }: any) {
 
         <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md border border-white/30 text-black text-xs px-2 py-1 rounded-md shadow-lg flex items-center space-x-1">
           <IconComponent className="h-3 w-3" />
-          <span>{item.category}</span>
+          <span className="capitalize">
+            {item.category === "business"
+              ? item.business_category
+              : item.category}
+          </span>
         </div>
 
         {/* <div className="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-2xl shadow-lg">

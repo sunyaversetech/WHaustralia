@@ -50,11 +50,16 @@ export default function EventsPageClient() {
       <div className="container-modern py-4 md:py-8  w-auto">
         <EventHeader />
         {isLoading ? (
-          <div className="flex  items-center gap-2   mt-5">
-            <Skeleton className="h-72 w-96 mb-4 animate-pulse rounded-xl" />
-            <Skeleton className="h-72 w-96 mb-4 animate-pulse" />
-            <Skeleton className="h-72 w-96 mb-4 animate-pulse" />
-          </div>
+          <>
+            <div className="flex max-md:hidden  items-center gap-2   mt-5">
+              <Skeleton className="h-72 w-96 mb-4 animate-pulse rounded-xl" />
+              <Skeleton className="h-72 w-96 mb-4 animate-pulse" />
+              <Skeleton className="h-72 w-96 mb-4 animate-pulse" />
+            </div>
+            <div className="flex md:hidden  items-center gap-2   mt-5">
+              <Skeleton className="h-72 w-96 mb-4 animate-pulse rounded-xl" />
+            </div>
+          </>
         ) : events.length !== 0 ? (
           <>
             <Tabs value={view} className="w-full">
