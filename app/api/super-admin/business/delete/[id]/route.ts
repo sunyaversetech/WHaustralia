@@ -9,6 +9,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
+  const body = await req.json();
+  const { id } = body;
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -17,7 +19,7 @@ export async function POST(req: NextRequest) {
   }
 
   await connectToDb();
-  const user = await User.findOne({ _id: session.user.id });
+  const user = await User.findOne({ _id: id });
 
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });

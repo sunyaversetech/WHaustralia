@@ -39,7 +39,7 @@ const CATEGORY_ICONS: Record<string, any> = {
   consultancy: Briefcase,
   "driving school": Car,
   electrician: Zap,
-  "event organizer": Calendar,
+  "event-organizer": Calendar,
   "food truck": Truck,
   grocery: ShoppingBasket,
   painter: Paintbrush,
@@ -174,8 +174,7 @@ export default function BusinessHeader() {
         <Tabs
           value={currentTab}
           onValueChange={handleTabChange}
-          className="w-auto"
-        >
+          className="w-auto">
           <TabsList className="w-auto">
             <TabsTrigger value="list">List</TabsTrigger>
             <TabsTrigger value="map">Map</TabsTrigger>
@@ -200,8 +199,7 @@ export default function BusinessHeader() {
           <Select
             onValueChange={(val) => {
               updateQuery({ community: val === "All" ? null : val });
-            }}
-          >
+            }}>
             <SelectTrigger className="flex items-center w-full gap-2 border border-primary rounded-full text-primary font-bold capitalize">
               {currentCommunity ?? "All Community"}
             </SelectTrigger>
@@ -236,8 +234,7 @@ export default function BusinessHeader() {
                 isActive
                   ? "bg-primary border-primary text-white"
                   : "bg-white border-slate-100 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
-              }`}
-            >
+              }`}>
               <Icon
                 className={`h-4 w-4 sm:h-5 sm:w-5 mb-1 ${isActive ? "text-white" : "text-slate-500"}`}
               />
