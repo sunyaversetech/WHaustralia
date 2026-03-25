@@ -21,6 +21,8 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import Loading from "@/app/businesses/loading";
+import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const operatinghoursformSchema = z.object({
   business_id: z.string().optional(),
@@ -54,6 +56,7 @@ const DEFAULT_SCHEDULE = [
 
 export function BusinessHoursForm() {
   const { data, isLoading } = useGetOperatingHours();
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(operatinghoursformSchema),
@@ -120,7 +123,15 @@ export function BusinessHoursForm() {
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-6 max-w-2xl p-6">
-        <h2 className="text-xl font-bold">Operating Hours</h2>
+        <div className="space-y-6 flex items-center ">
+          <Button
+            className="h-5 w-5 mt-7 mr-2"
+            variant="ghost"
+            onClick={() => router.back()}>
+            <ChevronLeft className="h-8 w-8 cursor-pointer rounded-full p-1 -ml-2 text-[#ODODOD] transition-all hover:scale-105 active:scale-95" />
+          </Button>
+          <h2 className="text-xl font-bold">Operating Hours</h2>
+        </div>
 
         <FormField
           control={form.control}

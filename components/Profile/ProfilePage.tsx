@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { ChevronLeft, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { signOut, useSession } from "next-auth/react";
@@ -8,10 +8,13 @@ import ProfileAvatar from "../Dashboard/ProfilePic";
 import { DeleteConfirmDialog } from "../ui/DynamicDeleteButton";
 import { useDeleteProfile } from "@/services/Auth/auth.service";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 const ProfilePage = ({ userData }: { userData: any }) => {
   const { data: session } = useSession();
   const { mutate: deleteAccount, isPending } = useDeleteProfile();
+  const router = useRouter();
 
   const handleDelete = (id: string) => {
     deleteAccount(
@@ -31,6 +34,12 @@ const ProfilePage = ({ userData }: { userData: any }) => {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
+      <Button
+        className="h-5 w-5 mt-7 mr-2"
+        variant="ghost"
+        onClick={() => router.back()}>
+        <ChevronLeft className="h-8 w-8 cursor-pointer rounded-full p-1 -ml-2 text-[#ODODOD] transition-all hover:scale-105 active:scale-95" />
+      </Button>
       <div className="relative bg-white border rounded-2xl p-8 shadow-sm">
         <div className="bg-white flex justify-between rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
           <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
