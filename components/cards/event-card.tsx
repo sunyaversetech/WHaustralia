@@ -137,8 +137,7 @@ const EventCard = memo(function EventCard({ event }: { event: any }) {
                 </div>
               </div>
 
-              {/* Ticket Button */}
-              {event.ticket_price && event.ticket_price > 0 ? (
+              {event.price_category === "paid" ? (
                 <a
                   href={event.ticketUrl || "#"}
                   target="_blank"
@@ -147,7 +146,7 @@ const EventCard = memo(function EventCard({ event }: { event: any }) {
                   onClick={(e) => e.stopPropagation()}>
                   <Ticket className="h-4 w-4 text-white" />
                   <span className="text-white font-medium md:text-sm">
-                    ${event.ticket_price}
+                    Ticket
                   </span>
                 </a>
               ) : (

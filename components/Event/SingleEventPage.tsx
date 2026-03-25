@@ -387,21 +387,19 @@ export default function EventDetailPage() {
                   </h3>
                   <div className="space-y-3">
                     {event?.data?.ticket_link ? (
-                      <Button
-                      // href={event.data?.ticket_link}
-                      // target="_blank"
-                      >
-                        <Ticket className="h-4 w-4" />
+                      <Link
+                        href={event.data?.ticket_link}
+                        target="_blank"
+                        className="w-full bg-[#041e3a] flex text-white rounded-full text-center items-center justify-center space-x-2 px-4 py-1.5 font-medium">
+                        <Ticket className="h-4 w-4 " />
                         <span>Get Tickets</span>
-                      </Button>
+                      </Link>
                     ) : (
                       // <div className="w-full bg-green-500 text-white px-4 py-3 rounded-xl font-medium flex items-center justify-center space-x-2 shadow-md">
                       //   <Ticket className="h-4 w-4" />
                       //   <span>Free Entry</span>
                       // </div>
-
                       <Button className="w-full">
-                        {" "}
                         <Ticket className="h-4 w-4 mr-2" />
                         Free Entry
                       </Button>

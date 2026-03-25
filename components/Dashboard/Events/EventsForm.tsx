@@ -60,7 +60,7 @@ export const eventSchema = z.object({
   category_name: z.string().optional(),
   price_category: z.enum(["free", "paid"]),
   ticket_link: z.string().optional(),
-  ticket_price: z.union([z.number(), z.literal("")]).optional(),
+  ticket_price: z.string().optional(),
   community: z.string().min(1, "Community is required"),
   community_name: z.string().optional(),
   city: z.string().min(2, "City is required"),
@@ -101,7 +101,7 @@ export function EventForm() {
       category: data?.category ?? "",
       category_name: data?.category_name ?? "",
       ticket_link: data?.ticket_link ?? "",
-      ticket_price: Number(data?.ticket_price) ?? "",
+      ticket_price: String(data?.ticket_price) ?? "",
       email: data?.email ?? "",
       phone_number: data?.phone_number ? String(data?.phone_number) : "",
       website_link: data?.website_link ?? "",
@@ -132,13 +132,15 @@ export function EventForm() {
       form.setValue("price_category", data.price_category);
       form.setValue("ticket_link", data.ticket_link ?? "");
       if (data.ticket_price)
-        form.setValue("ticket_price", Number(data.ticket_price));
+        form.setValue("ticket_price", String(data.ticket_price));
       if (data?.email) form.setValue("email", data.email);
       if (data?.phone_number) form.setValue("phone_number", data.phone_number);
       if (data?.website_link) form.setValue("website_link", data.website_link);
       form.setValue("image", data.image);
     }
   }, [data, form]);
+
+  console.log("form values", form.formState.errors);
 
   const onSubmit = (values: EventFormValues) => {
     const formData = new FormData();
