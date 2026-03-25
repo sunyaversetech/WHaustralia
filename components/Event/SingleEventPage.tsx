@@ -24,7 +24,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { toast } from "sonner";
 import { useState } from "react";
-import LoadingPage from "@/components/ResuableComponents/Loading";
 import { Button } from "../ui/button";
 import {
   useCreateFavroite,
@@ -162,10 +161,16 @@ export default function EventDetailPage() {
                   <Calendar className="h-4 w-4 text-primary flex-shrink-0" />
                   <span className="font-medium text-foreground">
                     {event?.data.dateRange?.from
-                      ? `${formatDate(event?.data?.dateRange.from, "dd MMM yyyy")} - ${formatDate(
-                          event?.data.dateRange.to,
-                          "dd MMM yyyy",
-                        )}`
+                      ? `${formatDate(event?.data?.dateRange.from, "dd MMM yyyy")} ${
+                          event?.data?.dateRange.from !==
+                            event?.data?.dateRange.to &&
+                          event?.data?.dateRange.to
+                            ? `- ${formatDate(
+                                event?.data.dateRange.to,
+                                "dd MMM yyyy",
+                              )}`
+                            : ""
+                        }`
                       : "Date TBA"}
                   </span>
                 </div>
@@ -258,12 +263,14 @@ export default function EventDetailPage() {
                                 event?.data?.dateRange?.from,
                                 "dd MMM yyyy",
                               )}{" "}
-                            -{" "}
-                            {event?.data?.dateRange?.to &&
-                              formatDate(
-                                event?.data?.dateRange?.to,
-                                "dd MMM yyyy",
-                              )}
+                            {event?.data?.dateRange?.from !==
+                              event?.data?.dateRange?.to &&
+                            event?.data?.dateRange?.to
+                              ? `- ${formatDate(
+                                  event?.data?.dateRange?.to,
+                                  "dd MMM yyyy",
+                                )}`
+                              : ""}
                           </p>
                           <p className="font-medium text-gray-800">
                             {" "}
@@ -276,12 +283,11 @@ export default function EventDetailPage() {
                                 ),
                                 "h:mm aa",
                               )}{" "}
-                            -{" "}
                             {event?.data?.endTime &&
-                              format(
+                              `- ${format(
                                 parse(event.data.endTime, "HH:mm", new Date()),
                                 "h:mm aa",
-                              )}
+                              )}`}
                           </p>
                         </div>
                       </div>

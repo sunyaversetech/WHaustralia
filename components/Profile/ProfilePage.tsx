@@ -47,7 +47,6 @@ const ProfilePage = ({ userData }: { userData: any }) => {
               <div className="relative">
                 <ProfileAvatar currentImage={session?.user?.image || ""} />
               </div>
-
               <div className="flex-1">
                 <div className="flex  flex-col sm:flex-row sm:items-center gap-2">
                   <h1 className="text-xl font-bold text-slate-800">
