@@ -52,7 +52,7 @@ export const eventSchema = z.object({
     to: z.date(),
   }),
   email: z.email("Invalid email address").optional().or(z.literal("")),
-  phone_number: z.number().optional().or(z.literal("")),
+  phone_number: z.string().optional().or(z.literal("")),
   website_link: z.union([z.string(), z.literal("")]).optional(),
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
@@ -103,7 +103,7 @@ export function EventForm() {
       ticket_link: data?.ticket_link ?? "",
       ticket_price: data?.ticket_price ?? "",
       email: data?.email ?? "",
-      phone_number: Number(data?.phone_number) ?? undefined,
+      phone_number: data?.phone_number ?? "",
       website_link: data?.website_link ?? "",
     },
   });
@@ -133,7 +133,7 @@ export function EventForm() {
       form.setValue("ticket_link", data.ticket_link ?? "");
       if (data.ticket_price) form.setValue("ticket_price", data.ticket_price);
       form.setValue("email", data.email);
-      form.setValue("phone_number", Number(data.phone_number));
+      form.setValue("phone_number", data.phone_number);
       form.setValue("website_link", data.website_link);
       form.setValue("image", data.image);
     }
@@ -286,16 +286,7 @@ export function EventForm() {
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="e.g. +61 234 567 890"
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value ? Number(e.target.value) : "",
-                        )
-                      }
-                      type="number"
-                    />
+                    <Input placeholder="e.g. +61 234 567 890" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -23,7 +23,7 @@ export type EventType = {
   location: string;
   category_name: string;
   email: string;
-  phone_number: number;
+  phone_number: string;
   website_link: string;
   price_category: "free" | "paid";
   community_name: string;
