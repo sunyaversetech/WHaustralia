@@ -1,7 +1,6 @@
 "use client";
 
 import { memo } from "react";
-
 import { Calendar, MapPin, Building } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -27,7 +26,6 @@ const FeaturedCard = memo(function FeaturedCard({ item }: any) {
 
   const typeInfo = getTypeInfo();
   const IconComponent = typeInfo.icon;
-
   const slug = item?.business_name?.toLowerCase().replace(/[^a-z0-9]/g, "");
   const eventslug = item?.title?.toLowerCase().replace(/[^a-z0-9]/g, "");
 

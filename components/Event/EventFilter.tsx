@@ -1,11 +1,7 @@
-//
-
-// new code
-
 "use client";
 
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search,
   Globe,
@@ -14,6 +10,9 @@ import {
   Users,
   Tent,
   Utensils,
+  MapPinHouse,
+  Presentation,
+  MoveHorizontal,
 } from "lucide-react";
 import debounce from "lodash.debounce";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,19 +20,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 
 const CATEGORY_ICONS: Record<string, any> = {
   all: Globe,
+  concert: Music,
   community: Users,
   festival: Tent,
-  "cultural event": Music,
+  "cultural event": MapPinHouse,
   event: BookOpen,
-  others: Utensils,
+  "food event": Utensils,
+  "educational seminar": Presentation,
+  others: MoveHorizontal,
 };
 
 const BASE_CATEGORIES = [
   { name: "All", value: "all" },
-  { name: "Community", value: "Community" },
+  { name: "Concert", value: "Concert" },
   { name: "Festival", value: "Festival" },
   { name: "Cultural Event", value: "Cultural Event" },
-  { name: "Event", value: "Event" },
+  { name: "Educational Seminar", value: "Educational Seminar" },
+  { name: "Food Event", value: "Food Event" },
   { name: "Others", value: "Others" },
 ];
 
@@ -133,8 +136,7 @@ export default function EventHeader() {
           <Select
             onValueChange={(val) => {
               updateQuery({ community: val === "All" ? null : val });
-            }}
-          >
+            }}>
             <SelectTrigger className="flex w-full items-center gap-2 border border-blue-950 rounded-full text-blue-950 font-bold capitalize">
               {currentCommunity ?? "All Community"}
             </SelectTrigger>
@@ -169,8 +171,7 @@ export default function EventHeader() {
                 isActive
                   ? "bg-primary border-primary text-white"
                   : "bg-white border-slate-100 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
-              }`}
-            >
+              }`}>
               <Icon
                 className={`h-4 w-4 sm:h-5 sm:w-5 mb-1 ${
                   isActive ? "text-white" : "text-slate-500"

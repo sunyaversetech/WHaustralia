@@ -23,18 +23,13 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import {
-  useCreateEvent,
-  useGetSingleEvent,
-  useGetSingleForForm,
-} from "@/services/event.service";
+import { useCreateEvent, useGetSingleForForm } from "@/services/event.service";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import MapPicker from "./LeafLetIntegration";
 import { ChevronLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import Image from "next/image";
 
 const toggleItemStyles =
   "border! rounded-lg! px-7! py-2! data-[state=on]:bg-primary! min-w-fit data-[state=on]:text-primary-foreground! w-full  flex-1";
@@ -56,9 +51,9 @@ export const eventSchema = z.object({
     from: z.date(),
     to: z.date(),
   }),
-  email: z.email().min(1, "Email is required"),
-  phone_number: z.number().min(1, "Phone number is required"),
-  website_link: z.string().optional(),
+  email: z.email("Invalid email address").optional().or(z.literal("")),
+  phone_number: z.number().optional().or(z.literal("")),
+  website_link: z.union([z.string(), z.literal("")]).optional(),
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
   category: z.string().min(1, "Category is required"),
@@ -147,6 +142,10 @@ export function EventForm() {
   const onSubmit = (values: EventFormValues) => {
     const formData = new FormData();
     Object.entries(values).forEach(([key, value]) => {
+      if (value === "" || value === null || value === undefined) {
+        return;
+      }
+
       if (key === "dateRange" && value) {
         formData.append(key, JSON.stringify(value));
       } else {
@@ -391,10 +390,11 @@ export function EventForm() {
                     onValueChange={(val) => val && field.onChange(val)}
                     className="flex flex-wrap w-full gap-2">
                     {[
-                      "Community",
+                      "Concert",
                       "Festival",
+                      "Educational Seminar",
                       "Cultural Event",
-                      "Event",
+                      "Food Event",
                       "Others",
                     ].map((cat) => (
                       <ToggleGroupItem
