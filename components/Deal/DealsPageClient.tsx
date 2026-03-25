@@ -17,22 +17,20 @@ export default function DealsPageClient() {
     deals?.data?.filter((deal) => currentDate <= new Date(deal.valid_till));
 
   return (
-    <div className="min-h-screen bg-gradient-modern relative">
+    <div className="min-h-screen bg-gradient-modern relative max-xl:px-6">
       <div className="relative z-10">
-        <div className="container-modern py-3 md:py-6">
+        <div className="container-modern  md:py-6">
           <DealsHeader />
         </div>
-
-        {/* DEALS GRID */}
         <div className="container-modern pb-8">
           {isLoading ? (
-            <div className="flex  items-center gap-2   mt-5">
+            <div className="flex  items-center gap-2 mt-5">
               <Skeleton className="h-72 w-96 mb-4 animate-pulse rounded-xl" />
               <Skeleton className="h-72 w-96 mb-4 animate-pulse" />
               <Skeleton className="h-72 w-96 mb-4 animate-pulse" />
             </div>
           ) : data && data.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 max-xl:mt-2">
               {data.map((deal) => (
                 <DealCard key={deal._id} deal={deal} />
               ))}

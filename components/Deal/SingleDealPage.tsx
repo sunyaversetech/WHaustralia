@@ -107,6 +107,10 @@ export default function DealDetailPage({ params }: { params: { id: string } }) {
 
   if (!deal?.data) return <DealNotFoundPage />;
 
+  const slug =
+    deal?.data?.user?.business_name &&
+    deal?.data?.user?.business_name.toLowerCase().replace(/[^a-z0-9]/g, "");
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="fixed top-20 left-5 z-30">
@@ -152,7 +156,7 @@ export default function DealDetailPage({ params }: { params: { id: string } }) {
               {deal?.data?.user && (
                 <div className="mb-6">
                   <Link
-                    href={`/businesses/${deal.data.user._id}`}
+                    href={`/businesses/${slug}`}
                     className="block border border-gray-200 hover:bg-gray-50 rounded-lg p-4 -m-4 transition-colors">
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0">

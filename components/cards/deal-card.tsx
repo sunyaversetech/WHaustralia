@@ -58,6 +58,7 @@ export default function DealCard({ deal }: { deal: DealsGetValues }) {
   const isDealFavorite = userFavorites?.data?.deals?.some(
     (item: { _id: string }) => item._id.toString() === deal._id?.toString(),
   );
+
   return (
     <div
       className="block cursor-pointer"

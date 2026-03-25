@@ -125,15 +125,14 @@ export default function DealsHeader() {
           />
         </div>
 
-        <div className="flex-none">
+        {/* <div className="flex-none">
           <div className="text-center px-3 py-2 text-sm md:text-base bg-primary border text-white rounded-full cursor-pointer transition hover:bg-white hover:text-primary">
             All Deals
           </div>
-        </div>
+        </div> */}
       </div>
 
-      {/* Categories */}
-      <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
+      {/* <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
         {CATEGORIES.map((cat) => {
           const Icon = cat.icon;
           const isActive = activeCategory === cat.value;
@@ -159,7 +158,7 @@ export default function DealsHeader() {
             </button>
           );
         })}
-      </div>
+      </div> */}
     </div>
   );
 }

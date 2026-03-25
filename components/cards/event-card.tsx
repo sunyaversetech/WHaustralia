@@ -11,7 +11,6 @@ import {
 } from "@/services/favroite.service";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 
 const EventCard = memo(function EventCard({ event }: { event: any }) {
@@ -68,7 +67,6 @@ const EventCard = memo(function EventCard({ event }: { event: any }) {
     <div
       className="group relative overflow-hidden rounded-lg cursor-pointer"
       onClick={() => router.push(`/events/${slug}`)}>
-      {/* Full-Image Background */}
       <div className="relative h-56 md:h-60 w-full">
         <Image
           width={500}

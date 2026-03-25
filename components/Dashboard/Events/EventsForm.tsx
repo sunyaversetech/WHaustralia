@@ -36,7 +36,10 @@ const toggleItemStyles =
 
 export const eventSchema = z.object({
   _id: z.string().optional(),
-  title: z.string().min(2, "Title is required"),
+  title: z
+    .string()
+    .min(2, "Title is required")
+    .regex(/^[a-zA-Z0-9\s]+$/, "Special characters are not allowed"),
   image: z.union([
     z.string(),
     z
@@ -198,7 +201,26 @@ export function EventForm() {
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Event Name" {...field} />
+                    <Input
+                      placeholder="Event Name"
+                      {...field}
+                      onChange={(e) => {
+                        const rawValue = e.target.value;
+
+                        const hasSpecialChars = /[^a-zA-Z0-9\s]/.test(rawValue);
+
+                        if (hasSpecialChars) {
+                          form.setError("title", {
+                            type: "manual",
+                            message: "Special characters are not allowed",
+                          });
+                        } else {
+                          form.clearErrors("title");
+                        }
+
+                        field.onChange(rawValue);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
