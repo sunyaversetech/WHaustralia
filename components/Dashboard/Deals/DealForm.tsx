@@ -46,12 +46,15 @@ export const dealSchema = z.object({
 export type DealFormValues = z.infer<typeof dealSchema>;
 
 export default function DealForm() {
+  const router = useRouter();
   const form = useForm<DealFormValues>({
     resolver: zodResolver(dealSchema),
     defaultValues: {
       title: "",
       description: "",
       terms_for_the_deal: "",
+      category: "",
+      city: "",
     },
   });
 
@@ -61,13 +64,16 @@ export default function DealForm() {
       onSuccess: () => {
         form.reset();
         toast("Deal created successfully");
+        router.push("/dashboard/deals");
       },
       onError: (error: any) => {
+        console.error("API Error Details:", error);
         toast.error(error.response?.data?.message || "Failed to create deal");
       },
     });
   }
-  const router = useRouter();
+
+  console.log(form.formState.errors);
 
   return (
     <Form {...form}>
@@ -180,7 +186,7 @@ export default function DealForm() {
             name="category"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>City</FormLabel>
+                <FormLabel>Category</FormLabel>
                 <FormControl>
                   <ToggleGroup
                     type="single"
@@ -188,16 +194,12 @@ export default function DealForm() {
                     onValueChange={(val) => val && field.onChange(val)}
                     className="flex flex-wrap gap-4">
                     {[
-                      "all",
                       "Groceries",
-                      // "Shopping",
-                      // "Restaurant",
-                      // "Fashion",
-                      // "Events",
-                      // "Others",
-                      // "Hobart",
-                      // "Darwin",
-                      "others",
+                      "Shopping",
+                      "Restaurant",
+                      "Fashion",
+                      "Events",
+                      "Others",
                     ].map((cat) => (
                       <ToggleGroupItem
                         key={cat}

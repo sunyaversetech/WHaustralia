@@ -15,20 +15,24 @@ export async function POST(req: NextRequest) {
     const {
       title,
       valid_till,
-      deals_for,
       description,
       terms_for_the_deal,
-      deal_code,
+      category,
       max_redemptions,
       city,
     } = await req.json();
 
     const validTill = valid_till;
-    const dealsFor = deals_for;
     const termsForTheDeal = terms_for_the_deal;
-    const dealCode = deal_code;
 
-    if (!validTill || !title || !description || !termsForTheDeal || !city) {
+    if (
+      !validTill ||
+      !title ||
+      !description ||
+      !termsForTheDeal ||
+      !city ||
+      !category
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
@@ -38,11 +42,10 @@ export async function POST(req: NextRequest) {
     const newDeal = await Deal.create({
       title,
       valid_till: new Date(validTill),
+      category,
       user: (session.user as any).id,
-      deals_for: dealsFor,
       description,
       terms_for_the_deal: termsForTheDeal,
-      deal_code: dealCode,
       max_redemptions,
       city,
     });

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const query: any = {};
 
     if (category && category !== "all") {
-      query.business_category = category;
+      query.category = category;
     }
 
     const deals = await Deal.find(query).populate("user").sort({

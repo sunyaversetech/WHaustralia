@@ -4,6 +4,7 @@ import { PATCH, Post } from "@/lib/action";
 import { useFetcher } from "@/lib/generic.service";
 import { UserBusinessType } from "./business.service";
 import { DealFormValues } from "@/components/Dashboard/Deals/DealForm";
+import { useSearchParams } from "next/navigation";
 
 type DealsFormValues = {
   deal_id?: string;
@@ -29,15 +30,15 @@ export type DealsGetValues = {
 };
 
 export const useCreateDeals = () => {
-  return useMutation<ApiResponseType<DealFormValues>, any, FormData>({
+  return useMutation<ApiResponseType<DealFormValues>, any, DealFormValues>({
     mutationKey: ["createDeal"],
-    mutationFn: (data: FormData) =>
-      data.get("_id")
-        ? PATCH<FormData, ApiResponseType<DealFormValues>>({
-            url: `/api/deals/edit/${data.get("_id")}`,
+    mutationFn: (data: DealFormValues) =>
+      data._id
+        ? PATCH<DealFormValues, ApiResponseType<DealFormValues>>({
+            url: `/api/deals/edit/${data._id}`,
             data: data,
           })
-        : Post<FormData, ApiResponseType<DealFormValues>>({
+        : Post<DealFormValues, ApiResponseType<DealFormValues>>({
             url: "/api/deals",
             data: data,
           }),
@@ -53,10 +54,13 @@ export const useGetDeals = () => {
 };
 
 export const useGetAllDeals = () => {
+  const param = useSearchParams();
+
+  const category = param.get("category") || "";
   return useFetcher<ApiResponseType<DealsGetValues[]>>(
-    "all-deals",
+    ["all-deals", category],
     null,
-    "/api/deals/get-all",
+    `/api/deals/get-all?category=${category}`,
   );
 };
 
