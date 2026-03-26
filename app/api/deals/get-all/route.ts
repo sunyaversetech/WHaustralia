@@ -1,6 +1,9 @@
 import { connectToDb } from "@/lib/db";
 import { Deal } from "@/server/models/DealSchema.model";
 import { NextRequest, NextResponse } from "next/server";
+function escapeRegex(text: string) {
+  return text.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,8 +11,15 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const rawCategory = searchParams.get("category") || "";
     const category = rawCategory.replace(/\?+$/, "").trim();
+    const rawSearch = searchParams.get("search") || "";
+    const search = rawSearch.replace(/\?+$/, "").trim();
 
     const query: any = {};
+
+    if (search) {
+      const safeSearch = escapeRegex(search);
+      query.title = { $regex: safeSearch, $options: "i" };
+    }
 
     if (category && category !== "all") {
       query.category = category;
