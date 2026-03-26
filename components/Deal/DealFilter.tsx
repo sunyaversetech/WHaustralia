@@ -12,7 +12,6 @@ import {
   Globe,
 } from "lucide-react";
 import debounce from "lodash.debounce";
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 
 const CATEGORY_ICONS: Record<string, any> = {
   all: Globe,
@@ -25,11 +24,11 @@ const CATEGORY_ICONS: Record<string, any> = {
 
 const BASE_CATEGORIES = [
   { name: "All", value: "all" },
+  { name: "Groceries", value: "Groceries" },
   { name: "Shopping", value: "Shopping" },
   { name: "Restaurant", value: "Restaurant" },
-  { name: "Cafe", value: "Cafe" },
   { name: "Fashion", value: "Fashion" },
-  { name: "Deals", value: "Deal" },
+  { name: "Events", value: "Events" },
 ];
 
 export default function DealsHeader() {
@@ -132,7 +131,7 @@ export default function DealsHeader() {
         </div> */}
       </div>
 
-      {/* <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
+      <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
         {CATEGORIES.map((cat) => {
           const Icon = cat.icon;
           const isActive = activeCategory === cat.value;
@@ -158,7 +157,7 @@ export default function DealsHeader() {
             </button>
           );
         })}
-      </div> */}
+      </div>
     </div>
   );
 }

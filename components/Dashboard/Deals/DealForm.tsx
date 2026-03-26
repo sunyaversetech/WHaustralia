@@ -39,6 +39,7 @@ export const dealSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   terms_for_the_deal: z.string().min(1, "Terms are required"),
   max_redemptions: z.number().min(1, "Max redemptions is required"),
+  category: z.string().min(1, "Category is required"),
   city: z.string().min(1, "City is required"),
 });
 
@@ -157,6 +158,43 @@ export default function DealForm() {
                       // "Adelaide",
                       // "Gold Coast",
                       // "Perth",
+                      // "Hobart",
+                      // "Darwin",
+                      "others",
+                    ].map((cat) => (
+                      <ToggleGroupItem
+                        key={cat}
+                        value={cat}
+                        className={toggleItemStyles}>
+                        {cat}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>City</FormLabel>
+                <FormControl>
+                  <ToggleGroup
+                    type="single"
+                    value={field.value}
+                    onValueChange={(val) => val && field.onChange(val)}
+                    className="flex flex-wrap gap-4">
+                    {[
+                      "all",
+                      "Groceries",
+                      // "Shopping",
+                      // "Restaurant",
+                      // "Fashion",
+                      // "Events",
+                      // "Others",
                       // "Hobart",
                       // "Darwin",
                       "others",

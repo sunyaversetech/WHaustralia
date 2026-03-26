@@ -10,6 +10,7 @@ export interface IDeal {
   deal_code: string;
   max_redemptions: number;
   current_redemptions: number;
+  category: string;
   city: string;
 }
 
@@ -26,6 +27,7 @@ const DealSchema = new Schema<IDeal>(
     city: { type: String, required: true },
     terms_for_the_deal: { type: String, required: true },
     deal_code: { type: String },
+    category: { type: String, required: true },
     max_redemptions: { type: Number, required: true },
     current_redemptions: { type: Number, default: 0 },
   },

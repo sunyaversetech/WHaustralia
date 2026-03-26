@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await connectToDb();
     const session = await getServerSession(authOptions);
