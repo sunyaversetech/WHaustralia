@@ -1,7 +1,9 @@
 import { type Metadata } from "next";
+import { Suspense } from "react";
+import NextTopLoader from "nextjs-toploader";
 
-import { Inter, Quicksand } from "next/font/google";
-import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from "@/lib/seo";
+import { Hanken_Grotesk } from "next/font/google";
+import { SITE_URL, SITE_NAME } from "@/lib/seo";
 import JsonLd from "@/components/SEO/JsonLd";
 import "./globals.css";
 import SessionWrapper from "@/components/Auth/SessionWrapper";
@@ -12,52 +14,27 @@ import BottomNav from "@/components/ResuableComponents/BottomNavbar";
 import Footer from "@/components/ResuableComponents/Footer";
 import NavbarProvider from "@/components/ResuableComponents/NavbarProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthModal } from "@/components/Auth/DialogLogin/AuthModel";
+import AuthModalLoader from "@/components/Auth/DialogLogin/AuthModalLoader";
 
-/* Brand fonts:
-   Quicksand — headings, nav, buttons (friendly & rounded)
-   Inter      — body text, data, forms (legible & neutral) */
-const quicksand = Quicksand({
+// Single UI font for everything — headings, body, nav, buttons — matching
+// Fresha's one-family approach (their app uses Aktiv Grotesk, a commercial
+// font; Hanken Grotesk is the closest freely-licensed equivalent).
+const hankenGrotesk = Hanken_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-quicksand",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-hanken-grotesk",
   display: "swap",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const DEFAULT_DESCRIPTION =
-  "Discover events, local businesses, deals, and community news across Australia.";
-
+// Deliberately just metadataBase + icons here. Every other field (title,
+// description, alternates, openGraph, twitter) used to default to the
+// homepage's here and get inherited by any page that didn't override it -
+// and because a page-level openGraph/twitter replaces the parent's wholesale
+// rather than merging, even pages that DID override their title/canonical
+// kept shipping the homepage's og:title/og:url. Every static page now
+// builds its own complete metadata via lib/seo.ts's buildMetadata().
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: {
-    default: SITE_NAME,
-    template: `%s | ${SITE_NAME}`,
-  },
-  description: DEFAULT_DESCRIPTION,
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    type: "website",
-    siteName: SITE_NAME,
-    title: SITE_NAME,
-    description: DEFAULT_DESCRIPTION,
-    url: SITE_URL,
-    images: [DEFAULT_OG_IMAGE],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_NAME,
-    description: DEFAULT_DESCRIPTION,
-    images: [DEFAULT_OG_IMAGE.url],
-  },
   icons: {
     icon: [
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
@@ -95,7 +72,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${quicksand.variable} ${inter.variable} ${quicksand.className} antialiased bg-background overflow-y-scroll overflow-x-hidden`}>
+        data-ui="page-root"
+        className={`${hankenGrotesk.variable} ${hankenGrotesk.className} antialiased bg-background overflow-y-scroll overflow-x-hidden`}>
+        <NextTopLoader color="var(--primary)" showSpinner={false} height={3} />
         <JsonLd data={ORGANIZATION_JSON_LD} />
         <JsonLd data={WEBSITE_JSON_LD} />
         <ReactQueryContext>
@@ -107,10 +86,14 @@ export default function RootLayout({
                   {children}
                   <Footer />
                 </div>
-                <AuthModal />
+                <AuthModalLoader />
               </TooltipProvider>
               <Toaster />
-              <BottomNav />
+              {/* BottomNav reads useSearchParams() (for ?city=) - same
+                 Suspense requirement as Navbar, see NavbarProvider.tsx. */}
+              <Suspense fallback={null}>
+                <BottomNav />
+              </Suspense>
             </SessionWrapper>
           </CityFilterProvider>
         </ReactQueryContext>

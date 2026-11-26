@@ -1,10 +1,11 @@
 import { ApiResponseType } from "./apitypes";
 import { useMutation } from "@tanstack/react-query";
-import { PATCH, Post } from "@/lib/action";
+import { PATCH, Post } from "@/lib/client-fetch";
 import { useFetcher } from "@/lib/generic.service";
 import { EventFormValues } from "@/components/Dashboard/Events/EventsForm";
 import { useSearchParams } from "next/navigation";
 import { ReviewType } from "./review.service";
+import { eventsQueryKey } from "@/lib/queries/events-query";
 
 export type EventOptionType = {
   _id?: string;
@@ -190,18 +191,7 @@ export const useGetAllEvents = () => {
   const radius = param.get("radius") || "";
 
   return useFetcher<ApiResponseType<EventFormValues[]>>(
-    [
-      "allEvents",
-      category,
-      search,
-      city,
-      community,
-      from,
-      to,
-      lat,
-      lng,
-      radius,
-    ],
+    eventsQueryKey({ category, search, city, community, from, to, lat, lng, radius }),
     null,
     `/api/event/getallevent?category=${category}&search=${search}&city=${city}&community=${community}&from=${from}&to=${to}&lat=${lat}&lng=${lng}&radius=${radius}`,
   );
@@ -266,11 +256,12 @@ export const useRedeemEventCode = () => {
   });
 };
 
-export const useGetEventRedeem = () => {
+export const useGetEventRedeem = (enabled: boolean = true) => {
   return useFetcher<ApiResponseType<RedeemCodeResponseType[]>>(
     "redeem",
     null,
     "/api/event/redeem",
+    enabled,
   );
 };
 export const useGetEventRedeemBusiness = () => {

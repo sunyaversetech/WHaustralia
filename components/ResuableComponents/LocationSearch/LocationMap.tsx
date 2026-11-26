@@ -132,6 +132,25 @@ function FlyToLocation({
   return null;
 }
 
+/* ── Belt-and-braces resize handling: watches the map's own container
+   element directly instead of relying on every caller correctly passing
+   an isVisible/isExpanded prop every time its size can change (that's
+   exactly how SearchMap.tsx's fullscreen toggle went unnoticed — it never
+   forwarded isExpanded to this component at all, so FlyToLocation's
+   effect never re-fired and Leaflet kept rendering tiles sized for the
+   old, narrower container). Fires on any actual size change, whatever
+   caused it. ── */
+function MapResizeObserver() {
+  const map = useMap();
+  useEffect(() => {
+    const container = map.getContainer();
+    const observer = new ResizeObserver(() => map.invalidateSize());
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [map]);
+  return null;
+}
+
 /* ── Fire onBoundsChange whenever the user genuinely pans or zooms — not
    when the move was our own programmatic flyTo (FlyToLocation flags that
    via programmaticRef so it isn't mistaken for a manual map-area change). ── */
@@ -211,6 +230,11 @@ export type LocationMapProps<T> = {
   isVisible?: boolean;
   isExpanded?: boolean;
   onToggleExpand?: () => void;
+  /** Hands the caller the underlying Leaflet map instance once it mounts —
+   * for a caller (e.g. SearchMap.tsx) that renders its own zoom/expand
+   * controls instead of this component's built-in ones and needs
+   * something to actually call .zoomIn()/.zoomOut() on. */
+  onMapReady?: (map: L.Map) => void;
 };
 
 export default function LocationMap<T>({
@@ -229,6 +253,7 @@ export default function LocationMap<T>({
   isVisible = true,
   isExpanded = false,
   onToggleExpand,
+  onMapReady,
 }: LocationMapProps<T>) {
   const userLocation: [number, number] | null =
     userLat != null && userLng != null ? [userLat, userLng] : null;
@@ -297,12 +322,16 @@ export default function LocationMap<T>({
       )}
 
       <MapContainer
+        ref={onMapReady ? (map) => { if (map) onMapReady(map); } : undefined}
         center={initialBounds ? undefined : AU_CENTRE}
         zoom={initialBounds ? undefined : auZoom}
         bounds={initialBounds ?? undefined}
         zoomControl={false}
         className="h-full w-full"
         style={{ height: "100%", width: "100%", position: "absolute" }}>
+        {/* Plain OpenStreetMap tiles — free with no account/API key and no
+           commercial-use restrictions beyond OSM's standard fair-use +
+           attribution policy, unlike third-party basemap services. */}
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
@@ -311,6 +340,8 @@ export default function LocationMap<T>({
         {showLocateButton && (
           <UserLocationButton programmaticRef={programmaticRef} />
         )}
+
+        <MapResizeObserver />
 
         <FlyToLocation
           userLat={userLat}

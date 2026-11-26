@@ -18,9 +18,10 @@ import {
   useGetSingleEvent,
   useRedeemEventCode,
 } from "@/services/event.service";
-import EventCheckOut, { PurchasableOption } from "../Stripe/EventCheckOut";
+import type { PurchasableOption } from "../Stripe/EventCheckOut";
 import Image from "next/image";
-import { format, formatDate, parse } from "date-fns";
+import { formatDate } from "date-fns";
+import { formatEventDisplayDate, formatEventDisplayTime } from "@/lib/event-date";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -35,6 +36,7 @@ import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import EventDetailsSkeleton from "./SingleEventSkeleton";
+import EventPreviewShell, { type EventPreview } from "./EventPreviewShell";
 import { useAuthModal } from "../Auth/DialogLogin/use-auth-model";
 
 // Leaflet needs `window` and is a meaningful chunk of JS for a below-the-
@@ -42,6 +44,13 @@ import { useAuthModal } from "../Auth/DialogLogin/use-auth-model";
 // (components/Event/Event-map.tsx), instead of bloating every event page's
 // initial bundle.
 const EventLocationMap = dynamic(() => import("./EventLocationMap"), {
+  ssr: false,
+});
+
+// EventCheckOut calls loadStripe() (fetches js.stripe.com/v3) at module
+// scope, so a static import pulled that in on every event page view even
+// when checkout was never opened. Only ever rendered when isCheckoutOpen.
+const EventCheckOut = dynamic(() => import("../Stripe/EventCheckOut"), {
   ssr: false,
 });
 
@@ -55,10 +64,22 @@ export default function EventDetailPage() {
   const {
     data: event,
     isLoading,
-    isFetching,
     refetch: refetchEvent,
   } = useGetSingleEvent(slug);
   const queryClient = useQueryClient();
+  // Seeded by the search card's hover prefetch (components/cards/
+  // event-card.tsx) — covers fast clicks that outrun that prefetch, and
+  // is irrelevant (undefined) once the real `event` data has arrived.
+  const preview = queryClient.getQueryData<EventPreview>([
+    "eventPreview",
+    slug,
+  ]);
+  // Only matters right after a preview shell was shown — fades the real
+  // (higher-res) hero in instead of an abrupt swap from the shell's plain
+  // <img>. Starts true when there's no preview to hand off from, so the
+  // normal server-rendered case (no shell shown) isn't held at opacity-0
+  // waiting on a load event that may have already fired before mount.
+  const [heroLoaded, setHeroLoaded] = useState(!preview);
 
   const [redemptionResult, setRedemptionResult] = useState<{
     success: boolean;
@@ -68,7 +89,7 @@ export default function EventDetailPage() {
   } | null>(null);
 
   const { mutate: redeem, isPending: redeemPending } = useRedeemEventCode();
-  const { data, isLoading: redeemLoading } = useGetEventRedeem();
+  const { data } = useGetEventRedeem(!!session);
   const { onOpen } = useAuthModal();
 
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -380,14 +401,14 @@ export default function EventDetailPage() {
     (item) => (item._id ?? "").toString() === EventId?.toString(),
   );
 
-  if (isLoading || redeemLoading || isFetching) {
-    <EventDetailsSkeleton />;
-  }
-
   return (
-    <div className="relative md:container-modern mx-auto md:p-6 pb-20 md:pb-0 md:mt-20">
+    <div className="relative md:container-modern mx-auto md:p-6 pb-20 md:pb-0 lg:mt-[72px]">
       {isLoading ? (
-        <EventDetailsSkeleton />
+        preview ? (
+          <EventPreviewShell preview={preview} />
+        ) : (
+          <EventDetailsSkeleton />
+        )
       ) : (
         <>
           {isCheckoutOpen && (
@@ -514,18 +535,15 @@ export default function EventDetailPage() {
                 <div className="flex items-center gap-1 sm:gap-2">
                   <Calendar className="h-4 w-4 text-primary flex-shrink-0" />
                   <span className="font-medium text-foreground">
-                    {event?.data?.dateRange?.from
-                      ? `${formatDate(event?.data?.dateRange.from, "dd MMM yyyy")} ${
-                          event?.data?.dateRange.from !==
-                            event?.data?.dateRange.to &&
-                          event?.data?.dateRange.to
-                            ? `- ${formatDate(
-                                event?.data?.dateRange.to,
-                                "dd MMM yyyy",
-                              )}`
-                            : ""
-                        }`
-                      : "Date TBA"}
+                    {(() => {
+                      const from = formatEventDisplayDate(event?.data?.dateRange?.from);
+                      if (!from) return "Date TBA";
+                      const to =
+                        event?.data?.dateRange?.from !== event?.data?.dateRange?.to
+                          ? formatEventDisplayDate(event?.data?.dateRange?.to)
+                          : null;
+                      return to ? `${from} - ${to}` : from;
+                    })()}
                   </span>
                 </div>
 
@@ -534,18 +552,10 @@ export default function EventDetailPage() {
                 <div className="flex items-center gap-1 sm:gap-2">
                   <Clock className="h-4 w-4 text-primary flex-shrink-0" />
                   <p className="font-medium text-gray-800">
-                    {event?.data?.startTime
-                      ? format(
-                          parse(event.data.startTime, "HH:mm", new Date()),
-                          "h:mm aa",
-                        )
-                      : "Time TBA"}
-
+                    {formatEventDisplayTime(event?.data?.startTime) ?? "Time TBA"}
                     {event?.data?.endTime &&
-                      ` - ${format(
-                        parse(event.data.endTime, "HH:mm", new Date()),
-                        "h:mm aa",
-                      )}`}
+                      formatEventDisplayTime(event.data.endTime) &&
+                      ` - ${formatEventDisplayTime(event.data.endTime)}`}
                   </p>
                 </div>
               </div>
@@ -555,14 +565,21 @@ export default function EventDetailPage() {
               <div className="relative h-80 md:h-[70vh] w-full md:rounded-xl overflow-hidden">
                 <Image
                   fill
+                  priority
+                  fetchPriority="high"
+                  sizes="(max-width: 768px) 100vw, 60vw"
                   src={event?.data?.image || "/placeholder.svg"}
                   alt={event?.data?.title || "Event Image"}
-                  className="w-full h-full object-cover"
+                  onLoad={() => setHeroLoaded(true)}
+                  className={cn(
+                    "w-full h-full object-cover transition-opacity duration-300",
+                    heroLoaded ? "opacity-100" : "opacity-0",
+                  )}
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent z-10 md:rounded-2xl"></div>
 
-                <div className="absolute inset-0 z-60 flex items-start justify-between p-3 md:hidden">
+                <div className="absolute inset-0 z-60 flex items-start justify-between p-3 lg:hidden">
                   <Button
                     variant={"ghost"}
                     className="p-0 transition-all hover:scale-105 active:scale-95"
@@ -729,27 +746,17 @@ export default function EventDetailPage() {
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-primary" />
                         <span>
-                          {event?.data?.dateRange?.from
-                            ? `${formatDate(event.data.dateRange.from, "dd MMM yyyy")}`
-                            : "Date TBA"}
+                          {formatEventDisplayDate(event?.data?.dateRange?.from) ?? "Date TBA"}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-primary" />
                         <p className="font-medium text-gray-800">
-                          {event?.data?.startTime
-                            ? format(
-                                parse(
-                                  event.data.startTime,
-                                  "HH:mm",
-                                  new Date(),
-                                ),
-                                "h:mm aa",
-                              )
-                            : "Time TBA"}
+                          {formatEventDisplayTime(event?.data?.startTime) ?? "Time TBA"}
                           {event?.data?.endTime &&
-                            ` - ${format(parse(event.data.endTime, "HH:mm", new Date()), "h:mm aa")}`}
+                            formatEventDisplayTime(event.data.endTime) &&
+                            ` - ${formatEventDisplayTime(event.data.endTime)}`}
                         </p>
                       </div>
 

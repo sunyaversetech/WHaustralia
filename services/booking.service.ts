@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { Get, PATCH, Post } from "@/lib/action";
+import { Get, PATCH, Post } from "@/lib/client-fetch";
 
 // ─── Interfaces ─────────────────────────────────────────────────────────────
 
@@ -13,6 +13,7 @@ export interface ServiceType {
   /** @deprecated use max_concurrent_bookings for resource_based services */
   inventory?: number;
   base_price: number;
+  duration_type?: "fixed" | "not_fixed";
   base_duration: number;
   service_type?: "employee_based" | "resource_based" | "group_session";
   require_employee_selection: boolean;
@@ -114,6 +115,19 @@ export interface AvailableSlotsResponse {
   slot_remaining?: Record<string, number>; // resource_based only: remaining units per slot
 }
 
+export interface BatchSlotItem {
+  business_id: string;
+  service_id: string;
+}
+
+export interface BatchAvailableSlotsResponse {
+  success: boolean;
+  slots: Record<
+    string,
+    { available_slots: string[]; slot_remaining?: Record<string, number> }
+  >;
+}
+
 // ─── Queries & Mutations ────────────────────────────────────────────────────
 
 export const useGetServices = (businessId?: string) => {
@@ -151,6 +165,31 @@ export const useGetAvailableSlots = (
       return Get({ url });
     },
     enabled: !!serviceId && !!date,
+  });
+};
+
+// Powers live time-slot buttons on the search-results cards — one request
+// for every visible card's top services instead of one request per card.
+export const useGetBatchAvailableSlots = (
+  items: BatchSlotItem[],
+  date: string,
+  timezone: string = "UTC",
+) => {
+  const key = items
+    .map((i) => `${i.business_id}:${i.service_id}`)
+    .sort()
+    .join(",");
+  return useQuery<BatchAvailableSlotsResponse>({
+    queryKey: ["availableslots-batch", key, date, timezone],
+    queryFn: () =>
+      Post<
+        { date: string; timezone: string; items: BatchSlotItem[] },
+        BatchAvailableSlotsResponse
+      >({
+        url: "/api/bookings/available-slots/batch",
+        data: { date, timezone, items },
+      }),
+    enabled: items.length > 0 && !!date,
   });
 };
 

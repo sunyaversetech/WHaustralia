@@ -464,7 +464,7 @@ export default function BusinessPage() {
 
   const MainContent = () => (
     <div>
-      {community.length > 0 && (
+      {/* {community.length > 0 && (
         <>
           <section style={{ marginBottom: 28 }}>
             <SecTitle>Community</SecTitle>
@@ -504,7 +504,7 @@ export default function BusinessPage() {
           <Divider my={0} />
           <div style={{ height: 28 }} />
         </>
-      )}
+      )} */}
 
       <section>
         <SecTitle>
@@ -610,40 +610,6 @@ export default function BusinessPage() {
       {/* REVIEWS */}
       <Divider />
       <section>
-        {ratingNum && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 14,
-              marginBottom: 24,
-              padding: "20px 24px",
-              background: T.bg,
-              borderRadius: 16,
-              border: `1px solid ${T.border}`,
-            }}>
-            <div style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  fontSize: 48,
-                  fontWeight: 900,
-                  color: T.navy,
-                  lineHeight: 1,
-                }}>
-                {ratingNum.toFixed(1)}
-              </div>
-              <div style={{ fontSize: 12, color: T.gray, marginTop: 4 }}>
-                out of 5
-              </div>
-            </div>
-            <div>
-              <StarRow rating={ratingNum} size={24} />
-              <div style={{ fontSize: 14, color: T.gray, marginTop: 6 }}>
-                Based on {totalReviews} review{totalReviews !== 1 ? "s" : ""}
-              </div>
-            </div>
-          </div>
-        )}
         <BusinessReviewSection
           reviews={reviews?.data || []}
           businessId={businessId}
@@ -1042,7 +1008,7 @@ export default function BusinessPage() {
   return (
     <div style={{ minHeight: "100vh", background: T.white }}>
       {/* ══════════ MOBILE LAYOUT ══════════ */}
-      <div className="md:hidden">
+      <div className="lg:hidden">
         {/* Full-bleed hero */}
         <div
           style={{ position: "relative", height: 300, cursor: "pointer" }}
@@ -1172,156 +1138,12 @@ export default function BusinessPage() {
       </div>
 
       {/* ══════════ DESKTOP LAYOUT ══════════ */}
-      <div className="hidden md:block">
-        <div style={{ height: 80 }} />
+      <div className="hidden lg:block">
+        <div style={{ height: 72 }} />
 
-        {/* ── HERO IMAGE GRID ── */}
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: "0 32px",
-          }}>
-          {/* Top action row */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              gap: 10,
-              marginBottom: 14,
-            }}>
-            <button
-              onClick={handleShare}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                background: "transparent",
-                border: `1px solid ${T.border}`,
-                borderRadius: 8,
-                padding: "7px 14px",
-                fontSize: 13,
-                fontWeight: 600,
-                color: T.navy,
-                cursor: "pointer",
-              }}>
-              <Share2 size={14} />
-              Share
-            </button>
-            <button
-              onClick={handleFav}
-              disabled={isPending}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                background: "transparent",
-                border: `1px solid ${T.border}`,
-                borderRadius: 8,
-                padding: "7px 14px",
-                fontSize: 13,
-                fontWeight: 600,
-                color: isBusinessFavorite ? "#e11d48" : T.navy,
-                cursor: "pointer",
-              }}>
-              {isPending ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <Heart
-                  size={14}
-                  fill={isBusinessFavorite ? "#e11d48" : "none"}
-                  color={isBusinessFavorite ? "#e11d48" : T.navy}
-                />
-              )}
-              {isBusinessFavorite ? "Saved" : "Save"}
-            </button>
-          </div>
-
-          {/* Image grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1.55fr 1fr",
-              gridTemplateRows: "220px 220px",
-              gap: 8,
-              borderRadius: 20,
-              overflow: "hidden",
-              height: 448,
-            }}>
-            {/* Large main image spans both rows */}
-            <div
-              style={{
-                position: "relative",
-                gridRow: "1 / 3",
-                cursor: "pointer",
-              }}
-              onClick={() => openLightbox(0)}>
-              <Image
-                fill
-                src={allImages[0]}
-                alt={name}
-                style={{ objectFit: "cover" }}
-                priority
-                sizes="(max-width: 1200px) 60vw, 720px"
-              />
-            </div>
-            {/* Top-right small image */}
-            <div
-              style={{ position: "relative", cursor: "pointer" }}
-              onClick={() => openLightbox(1)}>
-              <Image
-                fill
-                src={allImages[1] ?? allImages[0]}
-                alt={name}
-                style={{ objectFit: "cover", filter: "brightness(0.92)" }}
-                sizes="320px"
-              />
-            </div>
-            {/* Bottom-right small image + "See all" */}
-            <div
-              style={{ position: "relative", cursor: "pointer" }}
-              onClick={() => openLightbox(2)}>
-              <Image
-                fill
-                src={allImages[2] ?? allImages[0]}
-                alt={name}
-                style={{ objectFit: "cover", filter: "brightness(0.82)" }}
-                sizes="320px"
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "rgba(2,12,26,0.18)",
-                  display: "flex",
-                  alignItems: "flex-end",
-                  justifyContent: "flex-end",
-                  padding: 14,
-                }}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openLightbox(0);
-                  }}
-                  style={{
-                    background: "rgba(255,255,255,0.95)",
-                    border: "none",
-                    borderRadius: 8,
-                    padding: "7px 16px",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: T.navy,
-                    cursor: "pointer",
-                  }}>
-                  See all photos
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── BUSINESS INFO BAR ── */}
+        {/* ── BUSINESS INFO BAR — name, rating, location, now above the
+           gallery (matches how real business-profile references like
+           Google Maps lay this out: identity first, photos after) ── */}
         <div
           style={{
             maxWidth: 1200,
@@ -1403,7 +1225,7 @@ export default function BusinessPage() {
               )}
             </div>
 
-            {/* Right: service count + book button */}
+            {/* Right: share/save actions + service count */}
             <div
               style={{
                 display: "flex",
@@ -1412,21 +1234,183 @@ export default function BusinessPage() {
                 gap: 10,
                 flexShrink: 0,
               }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <button
+                  onClick={handleShare}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    background: "transparent",
+                    border: `1px solid ${T.border}`,
+                    borderRadius: 8,
+                    padding: "7px 14px",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: T.navy,
+                    cursor: "pointer",
+                  }}>
+                  <Share2 size={14} />
+                  Share
+                </button>
+                <button
+                  onClick={handleFav}
+                  disabled={isPending}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    background: "transparent",
+                    border: `1px solid ${T.border}`,
+                    borderRadius: 8,
+                    padding: "7px 14px",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: isBusinessFavorite ? "#e11d48" : T.navy,
+                    cursor: "pointer",
+                  }}>
+                  {isPending ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Heart
+                      size={14}
+                      fill={isBusinessFavorite ? "#e11d48" : "none"}
+                      color={isBusinessFavorite ? "#e11d48" : T.navy}
+                    />
+                  )}
+                  {isBusinessFavorite ? "Saved" : "Save"}
+                </button>
+              </div>
               {activeServices.length > 0 && (
                 <span style={{ fontSize: 13, color: T.gray, fontWeight: 500 }}>
                   {activeServices.length} services available
                 </span>
               )}
-              {/* <BookNowBtn
-                onClick={() =>
-                  router.push(`/bookings?business_id=${businessId}`)
-                }
-              /> */}
             </div>
           </div>
 
           {/* Thin divider */}
-          <div style={{ height: 1, background: T.border, marginTop: 24 }} />
+          <div style={{ height: 1, background: T.border, marginTop: 20 }} />
+        </div>
+
+        {/* ── HERO IMAGE GRID ── */}
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "20px 32px 0",
+          }}>
+          {/* Image grid — shape follows how many real images there actually
+             are, instead of always drawing 3 cells and repeating the only
+             image into the empty ones. */}
+          {allImages.length === 1 ? (
+            <div
+              style={{
+                position: "relative",
+                borderRadius: 20,
+                overflow: "hidden",
+                height: 448,
+                cursor: "pointer",
+              }}
+              onClick={() => openLightbox(0)}>
+              <Image
+                fill
+                src={allImages[0]}
+                alt={name}
+                style={{ objectFit: "cover" }}
+                priority
+                sizes="(max-width: 1200px) 100vw, 1200px"
+              />
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1.55fr 1fr",
+                gridTemplateRows:
+                  allImages.length === 2 ? "448px" : "220px 220px",
+                gap: 8,
+                borderRadius: 20,
+                overflow: "hidden",
+                height: 448,
+              }}>
+              {/* Large main image spans both rows (when there are any) */}
+              <div
+                style={{
+                  position: "relative",
+                  gridRow: allImages.length === 2 ? undefined : "1 / 3",
+                  cursor: "pointer",
+                }}
+                onClick={() => openLightbox(0)}>
+                <Image
+                  fill
+                  src={allImages[0]}
+                  alt={name}
+                  style={{ objectFit: "cover" }}
+                  priority
+                  sizes="(max-width: 1200px) 60vw, 720px"
+                />
+              </div>
+              {/* Second image — the only other cell when there are exactly 2 */}
+              <div
+                style={{ position: "relative", cursor: "pointer" }}
+                onClick={() => openLightbox(1)}>
+                <Image
+                  fill
+                  src={allImages[1]}
+                  alt={name}
+                  style={{ objectFit: "cover", filter: "brightness(0.92)" }}
+                  sizes="320px"
+                />
+              </div>
+              {/* Third cell, only when a third image (or more) actually exists */}
+              {allImages.length >= 3 && (
+                <div
+                  style={{ position: "relative", cursor: "pointer" }}
+                  onClick={() => openLightbox(2)}>
+                  <Image
+                    fill
+                    src={allImages[2]}
+                    alt={name}
+                    style={{ objectFit: "cover", filter: "brightness(0.82)" }}
+                    sizes="320px"
+                  />
+                  {/* "See all photos" only makes sense when there are more
+                     than the 3 already shown. */}
+                  {allImages.length > 3 && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "rgba(2,12,26,0.18)",
+                        display: "flex",
+                        alignItems: "flex-end",
+                        justifyContent: "flex-end",
+                        padding: 14,
+                      }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openLightbox(0);
+                        }}
+                        style={{
+                          background: "rgba(255,255,255,0.95)",
+                          border: "none",
+                          borderRadius: 8,
+                          padding: "7px 16px",
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: T.navy,
+                          cursor: "pointer",
+                        }}>
+                        See all photos
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* ── 2-COLUMN CONTENT ── */}

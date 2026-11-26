@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
 import { format, addDays, formatDate } from "date-fns";
 import {
@@ -16,13 +16,21 @@ import {
   Minus,
   Plus,
   CreditCard,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import BookingCheckout from "./BookingCheckout";
 
 import {
@@ -47,6 +55,8 @@ interface BookingContainerProps {
 
 type StepType = "professionals" | "time";
 
+const SERVICES_PREVIEW_COUNT = 3;
+
 function formatDurationLabel(totalMinutes: number): string {
   const hours = Math.floor(totalMinutes / 60);
   const mins = totalMinutes % 60;
@@ -62,8 +72,56 @@ function getServiceMaxQty(s: ServiceType): number {
   return 0; // employee_based and group_session don't have multi-quantity booking
 }
 
+// Lifted to module scope (not a closure inside BookingContainer) so it isn't
+// redefined every render, matching the fix applied to ReviewCard/Comment.tsx
+// for the same react-hooks/static-components rule.
+function ServiceListItem({
+  service,
+  onBook,
+}: {
+  service: ServiceType;
+  onBook: () => void;
+}) {
+  return (
+    <div className="flex items-center w-full justify-between p-5 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all">
+      <div className="space-y-1 pr-4">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] uppercase font-bold text-primary tracking-wider bg-purple-50 px-2 py-0.5 rounded-md">
+            {service.category}
+          </span>
+          {getServiceMaxQty(service) > 0 && (
+            <span className="text-[10px] uppercase font-bold text-amber-600 tracking-wider bg-amber-50 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <Layers className="w-2.5 h-2.5" /> Max Qty:{" "}
+              {getServiceMaxQty(service)}
+            </span>
+          )}
+        </div>
+        <h3 className="font-bold text-base text-slate-900 pt-1">
+          {service.name}
+        </h3>
+        <p className="text-xs text-slate-400 flex items-center gap-1">
+          <Clock className="w-3.5 h-3.5" />{" "}
+          {service.duration_type === "not_fixed"
+            ? "Flexible duration"
+            : `${service.base_duration} mins`}
+        </p>
+        <p className="text-sm font-extrabold text-slate-900 pt-1">
+          AUD {service.base_price}
+        </p>
+      </div>
+      <Button
+        onClick={onBook}
+        className="px-5 rounded-xl border border-slate-200 hover:bg-slate-50 font-semibold"
+        variant="outline">
+        Book
+      </Button>
+    </div>
+  );
+}
+
 export default function BookingContainer({ services }: BookingContainerProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
   const { onOpen } = useAuthModal();
 
@@ -109,6 +167,13 @@ export default function BookingContainer({ services }: BookingContainerProps) {
       ? s.is_active
       : s.category === activeTab && s.is_active,
   );
+  const visibleDashboardServices = filteredDashboardServices.slice(
+    0,
+    SERVICES_PREVIEW_COUNT,
+  );
+  const hasMoreDashboardServices =
+    filteredDashboardServices.length > SERVICES_PREVIEW_COUNT;
+  const [servicesDrawerOpen, setServicesDrawerOpen] = useState(false);
 
   // Only employee_based services have professionals to select
   const isEmployeeBasedSelection = useMemo(
@@ -160,10 +225,16 @@ export default function BookingContainer({ services }: BookingContainerProps) {
   const finalDuration = useMemo(
     () =>
       selectedServices.reduce((acc, curr) => {
+        if (curr.duration_type === "not_fixed") return acc;
         const mult = selectedMultipliers[curr._id] || 1;
         return acc + curr.base_duration * mult;
       }, 0),
     [selectedServices, selectedMultipliers],
+  );
+
+  const hasFlexibleDuration = useMemo(
+    () => selectedServices.some((s) => s.duration_type === "not_fixed"),
+    [selectedServices],
   );
 
   const maxBookingDays = useMemo(
@@ -223,6 +294,45 @@ export default function BookingContainer({ services }: BookingContainerProps) {
     setHasAutoAdvancedDate(false);
     setIsDialogOpen(true);
   };
+
+  // Deep link from a search-results card's time-slot button
+  // (?book_service=&book_date=&book_slot=) — opens straight to the time
+  // step with that slot pre-selected instead of the usual service-picker
+  // entry point. Re-fetches/re-renders the slot through the normal
+  // useGetAvailableSlots call below, so a slot that's gone stale between
+  // the search page and this click still gets caught.
+  const appliedDeepLinkRef = useRef(false);
+  useEffect(() => {
+    if (appliedDeepLinkRef.current || services.length === 0) return;
+    const serviceId = searchParams.get("book_service");
+    const dateStr = searchParams.get("book_date");
+    const slot = searchParams.get("book_slot");
+    if (!serviceId || !dateStr || !slot) return;
+
+    const service = services.find((s) => s._id === serviceId && s.is_active);
+    if (!service) return;
+    appliedDeepLinkRef.current = true;
+
+    if (!session) {
+      onOpen();
+      return;
+    }
+    // One-time sync from the URL (a deep link, not derivable from render) —
+    // intentionally several setState calls rather than a single object, to
+    // match handleOpenBookingWizard's shape above.
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time deep-link read from the URL, not derivable from props/state */
+    setSelectedServices([service]);
+    setSelectedMultipliers({ [service._id]: 1 });
+    setSelectedQuantities({ [service._id]: 1 });
+    setIsNoPreference(true);
+    setSelectedEmployee(null);
+    setSelectedDate(new Date(`${dateStr}T00:00:00`));
+    setSelectedSlot(slot);
+    setHasAutoAdvancedDate(true);
+    setCurrentStep("time");
+    setIsDialogOpen(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [services, searchParams, session, onOpen]);
 
   const handleSelectMultiplier = (serviceId: string, value: number) => {
     setSelectedMultipliers({ ...selectedMultipliers, [serviceId]: value });
@@ -428,42 +538,58 @@ export default function BookingContainer({ services }: BookingContainerProps) {
         </div>
 
         <div className="grid grid-cols-1 gap-4">
-          {filteredDashboardServices.map((service) => (
-            <div
+          {visibleDashboardServices.map((service) => (
+            <ServiceListItem
               key={service._id}
-              className="flex items-center w-full justify-between p-5 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all">
-              <div className="space-y-1 pr-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] uppercase font-bold text-primary tracking-wider bg-purple-50 px-2 py-0.5 rounded-md">
-                    {service.category}
-                  </span>
-                  {getServiceMaxQty(service) > 0 && (
-                    <span className="text-[10px] uppercase font-bold text-amber-600 tracking-wider bg-amber-50 px-2 py-0.5 rounded-md flex items-center gap-1">
-                      <Layers className="w-2.5 h-2.5" /> Max Qty:{" "}
-                      {getServiceMaxQty(service)}
-                    </span>
-                  )}
-                </div>
-                <h3 className="font-bold text-base text-slate-900 pt-1">
-                  {service.name}
-                </h3>
-                <p className="text-xs text-slate-400 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" /> {service.base_duration} mins
-                </p>
-                <p className="text-sm font-extrabold text-slate-900 pt-1">
-                  AUD {service.base_price}
-                </p>
-              </div>
-              <Button
-                onClick={() => handleOpenBookingWizard(service)}
-                className="px-5 rounded-xl border border-slate-200 hover:bg-slate-50 font-semibold"
-                variant="outline">
-                Book
-              </Button>
-            </div>
+              service={service}
+              onBook={() => handleOpenBookingWizard(service)}
+            />
           ))}
         </div>
+
+        {hasMoreDashboardServices && (
+          <div className="flex justify-center pt-2">
+            <button
+              type="button"
+              className="border border-slate-300 rounded-full px-5 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
+              onClick={() => setServicesDrawerOpen(true)}>
+              {`Show all ${filteredDashboardServices.length} services`}
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* ─── ALL SERVICES DRAWER (full page, above the fixed header) ─── */}
+      <Drawer open={servicesDrawerOpen} onOpenChange={setServicesDrawerOpen}>
+        <DrawerContent className="min-h-screen! fixed inset-x-0 bottom-0 top-0! mt-0! rounded-t-none border-none z-[1001]">
+          <div className="mx-auto w-full h-full flex flex-col">
+            <DrawerHeader className="flex flex-row items-center justify-between border-b px-6">
+              <DrawerTitle className="text-2xl">
+                {`${filteredDashboardServices.length} services`}
+              </DrawerTitle>
+              <DrawerClose asChild>
+                <Button variant="ghost" size="icon">
+                  <X className="h-5 w-5" />
+                </Button>
+              </DrawerClose>
+            </DrawerHeader>
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="grid grid-cols-1 gap-4 max-w-3xl mx-auto">
+                {filteredDashboardServices.map((service) => (
+                  <ServiceListItem
+                    key={service._id}
+                    service={service}
+                    onBook={() => {
+                      setServicesDrawerOpen(false);
+                      handleOpenBookingWizard(service);
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
 
       {/* ─── BOOKING WIZARD DIALOG ─── */}
       <Dialog
@@ -471,7 +597,7 @@ export default function BookingContainer({ services }: BookingContainerProps) {
         onOpenChange={(open) => {
           if (!open && !isMutationLoading) handleGlobalWizardReset();
         }}>
-        <DialogContent className="w-full md:max-w-5xl z-50 p-0 overflow-hidden bg-[#F9F9F9] rounded-none md:rounded-3xl border-none flex flex-col md:flex-row h-dvh md:h-[90vh] md:max-h-180 shadow-2xl">
+        <DialogContent className="w-full md:max-w-5xl z-[1001] p-0 overflow-hidden bg-[#F9F9F9] rounded-none md:rounded-3xl border-none flex flex-col md:flex-row h-dvh md:h-[90vh] md:max-h-180 shadow-2xl">
           {/* Left Step Canvas */}
           {isPaymentModalOpen && activeLockId && checkoutSummary ? (
             <BookingCheckout
@@ -661,16 +787,23 @@ export default function BookingContainer({ services }: BookingContainerProps) {
                       })}
                     </div>
 
-                    {/* Duration Block Picker — resource_based only */}
+                    {/* Duration Block Picker — fixed-duration resource_based only;
+                       a not_fixed service has no base duration to multiply */}
                     {selectedServices.some(
-                      (s) => s.service_type === "resource_based",
+                      (s) =>
+                        s.service_type === "resource_based" &&
+                        s.duration_type !== "not_fixed",
                     ) && (
                       <div className="space-y-1.5">
                         <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
                           <Timer className="w-3 h-3" /> Choose Duration Block:
                         </label>
                         {selectedServices
-                          .filter((s) => s.service_type === "resource_based")
+                          .filter(
+                            (s) =>
+                              s.service_type === "resource_based" &&
+                              s.duration_type !== "not_fixed",
+                          )
                           .map((item) => {
                             const currentMult =
                               selectedMultipliers[item._id] || 1;
@@ -715,7 +848,9 @@ export default function BookingContainer({ services }: BookingContainerProps) {
                       </span>
                       <span className="font-black text-slate-900 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5 text-primary" />{" "}
-                        {formatDurationLabel(finalDuration)}
+                        {hasFlexibleDuration
+                          ? "Flexible"
+                          : formatDurationLabel(finalDuration)}
                       </span>
                     </div>
 
@@ -907,7 +1042,7 @@ export default function BookingContainer({ services }: BookingContainerProps) {
                   <div
                     className="w-11 h-11 rounded-xl bg-slate-900 bg-cover bg-center"
                     style={{
-                      backgroundImage: `url('https://wha-sunya-my-uploads.s3.ap-southeast-2.amazonaws.com/profile_1780979383458.jpeg')`,
+                      backgroundImage: `url('${services[0]?.business_id?.image || "/placeholder.svg"}')`,
                     }}
                   />
                   <div>
@@ -944,9 +1079,11 @@ export default function BookingContainer({ services }: BookingContainerProps) {
                               <p className="text-[10px] text-slate-400 mt-0.5 flex flex-col gap-0.5">
                                 <span>
                                   Duration:{" "}
-                                  {formatDurationLabel(
-                                    srv.base_duration * mult,
-                                  )}
+                                  {srv.duration_type === "not_fixed"
+                                    ? "Flexible"
+                                    : formatDurationLabel(
+                                        srv.base_duration * mult,
+                                      )}
                                 </span>
                                 {qty > 1 && (
                                   <span className="text-primary font-bold">
